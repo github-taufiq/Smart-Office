@@ -1,4 +1,4 @@
-package com.example.parkingbackend;
+package com.smartoff.parking;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

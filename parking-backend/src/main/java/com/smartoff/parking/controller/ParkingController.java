@@ -1,5 +1,7 @@
 package com.smartoff.parking.controller;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.smartoff.parking.model.ParkingSlot;
 import com.smartoff.parking.model.ParkingRow;
 import com.smartoff.parking.service.ParkingService;
@@ -30,8 +32,12 @@ public class ParkingController {
     }
     
     @GetMapping("/rows")
+    @JsonManagedReference
+    @JsonBackReference
     public ResponseEntity<List<ParkingRow>> getAllRows() {
-        return ResponseEntity.ok(parkingService.getAllRows());
+        List<ParkingRow> allRows = parkingService.getAllRows();
+        allRows.forEach(row -> System.out.println("row:"+row));
+        return ResponseEntity.ok(allRows);
     }
     
     @GetMapping("/stats/available-count")

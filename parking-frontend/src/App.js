@@ -2,26 +2,20 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import ParkingDashboard from './pages/ParkingDashboard'; // Import the actual component
+import { ParkingProvider } from './context/ParkingContext'; // Import the context provider
 
-// Simple components to test
 const Home = () => (
   <div className="container mt-4">
-    <h1>Smart Office - Parking Management System</h1>
+    <h2>Parking Management System</h2>
     <p>Welcome to the parking management system!</p>
-  </div>
-);
-
-const ParkingDashboard = () => (
-  <div className="container mt-4">
-    <h2>Parking Dashboard</h2>
-    <p>This is the parking dashboard page.</p>
   </div>
 );
 
 const AddParking = () => (
   <div className="container mt-4">
     <h2>Add Parking</h2>
-    <p>This is the add parking page.</p>
+    <p>Add parking functionality coming soon...</p>
   </div>
 );
 
@@ -32,8 +26,12 @@ const Reports = () => (
   </div>
 );
 
-// Simple Navigation
 const Navigation = () => (
+  <div>
+  <div className="text-center mb-4">
+      <h1 className="display-4 text-primary mb-2">Smart Office</h1>
+      <hr className="w-50 mx-auto mb-4" />
+    </div>
   <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
     <div className="container">
       <a className="navbar-brand" href="/">Parking System</a>
@@ -45,21 +43,24 @@ const Navigation = () => (
       </div>
     </div>
   </nav>
+  </div>
 );
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/parking" element={<ParkingDashboard />} />
-          <Route path="/add-parking" element={<AddParking />} />
-          <Route path="/reports" element={<Reports />} />
-        </Routes>
-      </div>
-    </Router>
+    <ParkingProvider>
+      <Router>
+        <div className="App">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/parking" element={<ParkingDashboard />} />
+            <Route path="/add-parking" element={<AddParking />} />
+            <Route path="/reports" element={<Reports />} />
+          </Routes>
+        </div>
+      </Router>
+    </ParkingProvider>
   );
 }
 
