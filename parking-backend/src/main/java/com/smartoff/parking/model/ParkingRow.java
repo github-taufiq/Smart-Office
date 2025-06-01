@@ -1,5 +1,6 @@
 package com.smartoff.parking.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class ParkingRow {
     @Column(name = "available_slots")
     private Integer availableSlots;
 
-    @JsonProperty
+    @JsonManagedReference
     @OneToMany(mappedBy = "parkingRow", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ParkingSlot> parkingSlots;
     

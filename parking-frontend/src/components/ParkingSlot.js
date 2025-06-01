@@ -8,7 +8,9 @@ const ParkingSlot = ({ slot }) => {
     toggleSlotStatus, 
     getSlotStatus, 
     isSlotEditing, 
-    hasEditingSlot 
+    hasEditingSlot,
+    reserveSlot,
+    cancelUpdate
   } = useParking();
 
   // Use slot.status directly as fallback if getSlotStatus doesn't work properly
@@ -19,19 +21,39 @@ const ParkingSlot = ({ slot }) => {
   // Debug logging
   console.log(`Slot ${slot.slotNumber}: status=${slot.status}, currentStatus=${currentStatus}, isEditing=${isEditing}, hasOtherSlotEditing=${hasOtherSlotEditing}`);
   
-  // Only allow clicking on AVAILABLE slots when no other slot is being edited
+  // Allow clicking on AVAILABLE slots when no other slot is being edited, OR clicking on currently editing slot
   const isClickable = !hasOtherSlotEditing && (currentStatus === 'AVAILABLE' || isEditing);
 
-  const handleSlotClick = () => {
-    console.log(`Slot ${slot.slotNumber} clicked - Current Status: ${currentStatus}`);
+  const handleSlotClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log(`Slot ${slot.slotNumber} clicked - Current Status: ${currentStatus}, isEditing: ${isEditing}`);
     
     if (!isClickable) {
       console.log('Slot not clickable');
       return;
     }
     
-    if (toggleSlotStatus) {
+    if (isEditing) {
+      // If clicking on an already selected slot, reserve it
+      console.log('Reserving slot...');
+      if (reserveSlot) {
+        reserveSlot(slot.id);
+      }
+    } else if (toggleSlotStatus) {
+      // Select the slot for editing
+      console.log('Selecting slot for editing...');
       toggleSlotStatus(slot.id);
+    }
+  };
+
+  const handleCancel = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Canceling slot edit...');
+    if (cancelUpdate) {
+      cancelUpdate();
     }
   };
 
@@ -133,15 +155,28 @@ const ParkingSlot = ({ slot }) => {
               {isEditing && (
                 <Badge bg="primary" style={{ fontSize: '0.6rem' }}>
                   <FaEdit size={8} className="me-1" />
-                  Reserving
+                  Selected
                 </Badge>
               )}
             </div>
 
             {isEditing && (
               <div className="mt-1">
-                <div style={{ fontSize: '0.65rem', color: '#0d6efd', fontWeight: 'bold' }}>
-                  Click to Reserve
+                <div className="d-flex gap-1">
+                  <button 
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: '0.6rem', padding: '2px 6px' }}
+                    onClick={handleSlotClick}
+                  >
+                    Reserve
+                  </button>
+                  <button 
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: '0.6rem', padding: '2px 6px' }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}
@@ -159,11 +194,6 @@ const ParkingSlot = ({ slot }) => {
             {isClickable && !isEditing && currentStatus === 'AVAILABLE' && (
               <div style={{ fontSize: '0.6rem', color: '#198754', fontWeight: 'bold' }}>
                 Available
-              </div>
-            )}
-            {isEditing && (
-              <div style={{ fontSize: '0.6rem', color: '#0d6efd', fontWeight: 'bold' }}>
-                Confirm
               </div>
             )}
             {!isClickable && !isEditing && (

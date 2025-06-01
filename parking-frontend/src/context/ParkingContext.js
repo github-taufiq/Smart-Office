@@ -226,6 +226,58 @@ export const ParkingProvider = ({ children }) => {
     setEditingSlot(null);
   };
 
+  // Add this new function after the cancelUpdate function (around line 200)
+  const reserveSlot = async (slotId) => {
+    console.log('reserveSlot called with slotId:', slotId);
+    
+    if (!editingSlot || editingSlot.id !== slotId) {
+      alert('No slot selected for reservation');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // If using mock data, just update the rows state
+      if (usingMockData) {
+        console.log('Reserving slot in mock data...');
+        setRows(prevRows => 
+          prevRows.map(row => ({
+            ...row,
+            parkingSlots: row.parkingSlots.map(slot => 
+              slot.id === editingSlot.id 
+                ? { ...slot, status: 'RESERVED' }
+                : slot
+            )
+          }))
+        );
+        setEditingSlot(null);
+        alert('Slot reserved successfully (mock data)');
+        return;
+      }
+
+      // Call the reserve API endpoint instead of updateSlotStatus
+      await parkingAPI.reserveSlot(slotId, 'admin'); // You'll need to implement this in your API service
+    
+      // Refresh data and clear editing state
+      await fetchRows();
+      setEditingSlot(null);
+      alert('Slot reserved successfully!');
+
+    } catch (err) {
+      console.error('Error reserving slot:', err);
+      alert(`Error reserving slot: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Add cancelSlotEdit function
+  const cancelSlotEdit = () => {
+    console.log('cancelSlotEdit called');
+    setEditingSlot(null);
+  };
+
   useEffect(() => {
     fetchRows();
   }, []);
@@ -242,6 +294,8 @@ export const ParkingProvider = ({ children }) => {
     hasEditingSlot,
     submitUpdate,
     cancelUpdate,
+    reserveSlot,
+    cancelSlotEdit,
     isSubmitting,
     editingSlot
   };

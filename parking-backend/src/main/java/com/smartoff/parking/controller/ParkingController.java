@@ -30,10 +30,16 @@ public class ParkingController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
     }
+
+
+    @PutMapping("/slots/{slotId}/status")
+    public ResponseEntity<Object> statusSlot(@PathVariable Long slotId) {
+        return parkingService.statusCheckSlot(slotId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
+    }
     
     @GetMapping("/rows")
-    @JsonManagedReference
-    @JsonBackReference
     public ResponseEntity<List<ParkingRow>> getAllRows() {
         List<ParkingRow> allRows = parkingService.getAllRows();
         allRows.forEach(row -> System.out.println("row:"+row));

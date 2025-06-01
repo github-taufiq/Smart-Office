@@ -38,8 +38,8 @@ export const mockParkingData = [
       {
         id: 5,
         slotNumber: "B2",
-        status: "OUT_OF_ORDER",
-        reservedByUser: null
+        status: "OCCUPIED",
+        reservedByUser: "user789"
       }
     ]
   },
