@@ -34,6 +34,9 @@ public class ParkingSlot {
     @Column(name = "vehicle_license_plate")
     private String vehicleLicensePlate;
     
+    @Column(name = "reservation_expires_at")
+    private LocalDateTime reservationExpiresAt;
+    
     // Constructors, getters, and setters
     public ParkingSlot() {}
     
@@ -55,4 +58,23 @@ public class ParkingSlot {
 
     public LocalDateTime getOccupiedSince() { return occupiedSince; }
     public void setOccupiedSince(LocalDateTime occupiedSince) { this.occupiedSince = occupiedSince; }
+
+    public LocalDateTime getReservationExpiresAt() { 
+        return reservationExpiresAt; 
+    }
+
+    public void setReservationExpiresAt(LocalDateTime reservationExpiresAt) { 
+        this.reservationExpiresAt = reservationExpiresAt; 
+    }
+
+    @Column(name = "reserved_by_user")
+    private String reservedByUser;
+
+    public String getReservedByUser() { 
+        return reservedByUser; 
+    }
+
+    public void setReservedByUser(String reservedByUser) { 
+        this.reservedByUser = reservedByUser; 
+    }
 }

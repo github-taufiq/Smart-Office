@@ -25,4 +25,6 @@ public interface ParkingRowRepository extends JpaRepository<ParkingRow, Long> {
     // Find rows with available slots
     @Query("SELECT pr FROM ParkingRow pr WHERE pr.parkingLotId = :parkingLotId AND pr.availableSlots > 0")
     List<ParkingRow> findRowsWithAvailableSlots(@Param("parkingLotId") Long parkingLotId);
+
+
 }

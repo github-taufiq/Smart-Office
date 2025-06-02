@@ -71,26 +71,7 @@ const ParkingDashboard = () => {
             </div>
             
             <div className="d-flex flex-column align-items-end">
-              {isEditing ? (
-                <ButtonGroup size="sm">
-                  <Button 
-                    variant="success" 
-                    onClick={submitUpdate}
-                    disabled={isSubmitting}
-                  >
-                    <FaSave className="me-1" />
-                    {isSubmitting ? 'Saving...' : 'Submit'}
-                  </Button>
-                  <Button 
-                    variant="outline-danger" 
-                    onClick={cancelUpdate}
-                    disabled={isSubmitting}
-                  >
-                    <FaTimes className="me-1" />
-                    Cancel
-                  </Button>
-                </ButtonGroup>
-              ) : (
+              {!isEditing ||(
                 <Button 
                   variant="outline-primary" 
                   size="sm"
@@ -119,30 +100,7 @@ const ParkingDashboard = () => {
         </Alert>
       )}
 
-      {/* Editing Alert */}
-      {isEditing && (
-        <Alert variant="info" className="mb-3">
-          <div className="d-flex justify-content-between align-items-center flex-wrap">
-            <div className="mb-2 mb-md-0">
-              <strong>Editing:</strong> Slot {editingSlot?.slotNumber} - 
-              <Badge bg="secondary" className="mx-1">{editingSlot?.originalStatus}</Badge>
-              →
-              <Badge bg={editingSlot?.newStatus === 'AVAILABLE' ? 'success' : 'warning'} className="ms-1">
-                {editingSlot?.newStatus}
-              </Badge>
-            </div>
-            <ButtonGroup size="sm">
-              <Button variant="success" onClick={submitUpdate} disabled={isSubmitting}>
-                Submit
-              </Button>
-              <Button variant="outline-secondary" onClick={cancelUpdate} disabled={isSubmitting}>
-                Cancel
-              </Button>
-            </ButtonGroup>
-          </div>
-        </Alert>
-      )}
-
+      
       {/* Parking Rows */}
       {!rows || rows.length === 0 ? (
         <Alert variant="info">

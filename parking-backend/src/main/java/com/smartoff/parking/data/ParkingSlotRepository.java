@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.smartoff.parking.model.ParkingSlot;
 import com.smartoff.parking.model.SlotStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,4 +41,11 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long> 
     // Find nearest available slot
     @Query("SELECT ps FROM ParkingSlot ps WHERE ps.status = :status AND ps.vehicleType = :vehicleType ORDER BY ps.id ASC")
     Optional<ParkingSlot> findFirstAvailableSlot(@Param("status") SlotStatus status, @Param("vehicleType") VehicleType vehicleType);
+    List<ParkingSlot> findByStatusAndReservationExpiresAtBefore(SlotStatus status, LocalDateTime dateTime);
+
+    @Query("SELECT ps FROM ParkingSlot ps JOIN ps.parkingRow pr WHERE ps.reservedByUser = :userName")
+    List<ParkingSlot> findByReservedByUser(String userName);
+
+    @Query("SELECT ps FROM ParkingSlot ps JOIN ps.parkingRow pr WHERE ps.reservedByUser = :userName AND  ps.status = :status")
+    List<ParkingSlot> findByReservedByUserAndStatus(String userName, SlotStatus status);
 }
