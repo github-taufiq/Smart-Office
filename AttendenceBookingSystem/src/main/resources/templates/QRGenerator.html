@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Gate - QR Check-in Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Custom font, similar to modern apps */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Styling for the QR code placeholder */
+        #qrcode canvas, #qrcode img {
+            margin: auto; /* Center the QR code */
+        }
+        .qr-placeholder {
+            width: 276px; /* Match QR code size + padding */
+            height: 276px;
+            border: 2px dashed #d1d5db; /* gray-300 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280; /* gray-500 */
+            font-size: 0.875rem;
+            text-align: center;
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center min-h-screen p-4 selection:bg-sky-400 selection:text-sky-900">
+
+<div class="bg-white shadow-2xl rounded-xl p-6 md:p-10 w-full max-w-md transform transition-all duration-500 ease-in-out">
+    <header class="text-center mb-8">
+        <svg class="w-16 h-16 mx-auto mb-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h-1m-1-6V4m0 1.083A9.002 9.002 0 0012 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.314-.016-.625-.046-.932M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <h1 class="text-3xl font-bold text-slate-800">Office Gate Check-in</h1>
+        <p class="text-slate-500 mt-2">Enter your Employee ID to generate a secure QR code for today's check-in.</p>
+    </header>
+
+    <div class="space-y-6">
+        <div>
+            <label for="userId" class="block text-sm font-medium text-slate-700 mb-1">Employee ID</label>
+            <input type="text" id="userId" name="userId"
+                   class="mt-1 block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 sm:text-sm transition duration-150"
+                   placeholder="e.g., EMP12345">
+        </div>
+
+        <button onclick="generateQrCode()"
+                class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition duration-150 ease-in-out">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4L3 9l9 5 9-5-9-5zM3.5 9.5L12 14.5l8.5-5M12 20l-9-5 9-5 9 5-9 5z"></path></svg>
+            Generate My Check-in QR
+        </button>
+    </div>
+
+    <div id="qrContainer" class="mt-8 text-center">
+        <div id="qrcode" class="w-[276px] h-[276px] mx-auto bg-white p-0 rounded-lg shadow-inner">
+        </div>
+        <p id="qrMessage" class="text-sm text-slate-600 mt-4 h-5"></p> </div>
+    <footer class="mt-8 text-center">
+        <p class="text-xs text-slate-400">&copy; <span id="currentYear"></span> Altimetrik Corp. All rights reserved.</p>
+    </footer>
+</div>
+
+<script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    const qrCodeElement = document.getElementById("qrcode");
+    const qrMessageElement = document.getElementById("qrMessage");
+
+    // Initialize with placeholder
+    function showQrPlaceholder() {
+        qrCodeElement.innerHTML = '<div class="qr-placeholder"><span>Enter your ID and click generate to display your QR code here.</span></div>';
+        qrMessageElement.textContent = '';
+    }
+    showQrPlaceholder();
+
+
+    function generateQrCode() {
+        const userId = document.getElementById('userId').value.trim();
+        if (!userId) {
+            qrMessageElement.textContent = 'Please enter your Employee ID.';
+            qrMessageElement.classList.add('text-red-500');
+            qrMessageElement.classList.remove('text-green-500');
+            document.getElementById('userId').focus();
+            return;
+        }
+
+        qrMessageElement.textContent = 'Generating QR Code...';
+        qrMessageElement.classList.remove('text-red-500', 'text-green-500');
+        qrMessageElement.classList.add('text-sky-600');
+
+
+        const payload = {
+            userId: userId,
+            timestamp: new Date().toISOString(),
+            type: "OFFICE_GATE_CHECKIN",
+            nonce: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) // Longer nonce
+        };
+
+        const qrDataString = JSON.stringify(payload);
+
+        // Clear previous QR code or placeholder
+        qrCodeElement.innerHTML = '';
+
+        // Use a slight delay to show "Generating..." message
+        setTimeout(() => {
+            try {
+                new QRCode(qrCodeElement, {
+                    text: qrDataString,
+                    width: 256,
+                    height: 256,
+                    colorDark : "#0f172a", // slate-900
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                // Add padding to the container AFTER QR is generated if needed, but qrcode.js usually handles its own canvas size.
+                // The parent div #qrcode has p-0, so the QR code itself will fill it. The size set in new QRCode is for the QR data area.
+                // The container #qrcode is 276x276, QR is 256x256, so a natural 10px padding on each side if QR is centered.
+                // The qrcode.js library might create a canvas or img tag. We ensure it's centered with CSS `margin: auto` on those elements.
+
+                console.log("Generated QR Data:", qrDataString);
+                qrMessageElement.textContent = 'QR Code Generated for ' + userId + '. Scan with your SmartOffice app.';
+                qrMessageElement.classList.add('text-green-600');
+                qrMessageElement.classList.remove('text-red-500', 'text-sky-600');
+            } catch (e) {
+                console.error("QR Generation Error:", e);
+                qrMessageElement.textContent = 'Error generating QR code.';
+                qrMessageElement.classList.add('text-red-500');
+                qrMessageElement.classList.remove('text-green-500', 'text-sky-600');
+                showQrPlaceholder(); // Show placeholder again on error
+            }
+        }, 200); // Small delay for UX
+    }
+</script>
+</body>
+</html>

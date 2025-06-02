@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SmartOffice</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #eef2f7; margin: 0; padding: 20px; box-sizing: border-box; }
+        .login-card { background-color: #fff; padding: 35px 45px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 420px; text-align: center; }
+        .login-card h2 { color: #2c3e50; margin-bottom: 15px; font-size: 28px; font-weight: 600; }
+        .login-card p.subtitle { color: #7f8c8d; margin-bottom: 30px; font-size: 15px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #34495e; font-size: 14px; }
+        .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; font-size: 15px; transition: border-color 0.3s; }
+        .input-group input:focus { border-color: #3498db; outline: none; box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); }
+        .login-button { width: 100%; padding: 14px; background-color: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 600; transition: background-color 0.3s; }
+        .login-button:hover { background-color: #2980b9; }
+        .error-message { color: #e74c3c; margin-top: 20px; min-height: 20px; font-size: 14px; font-weight: 500; }
+        .register-link { margin-top: 25px; font-size: 14px; }
+        .register-link a { color: #3498db; text-decoration: none; font-weight: 500; }
+        .register-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <h2>Welcome Back!</h2>
+    <p class="subtitle">Log in to access your SmartOffice dashboard.</p>
+    <form id="loginForm">
+        <div class="input-group">
+            <label for="username">Username / Employee ID</label>
+            <input type="text" id="username" name="username" required placeholder="Enter your username">
+        </div>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Enter your password">
+        </div>
+        <button type="submit" class="login-button">Login</button>
+    </form>
+    <div id="errorMessage" class="error-message"></div>
+    <div class="register-link">
+        Don't have an account? <a href="/register.html">Register Now</a>
+    </div>
+</div>
+
+<script>
+    const loginForm = document.getElementById('loginForm');
+    const errorMessageDiv = document.getElementById('errorMessage');
+    const JWT_TOKEN_KEY = 'smartoffice_jwt_token'; // Use a specific key
+
+    loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        errorMessageDiv.textContent = ''; // Clear previous errors
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) {
+            errorMessageDiv.textContent = 'Username and password are required.';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.accessToken) {
+                console.log('Login successful, token received:', data.accessToken);
+                localStorage.setItem(JWT_TOKEN_KEY, data.accessToken);
+                localStorage.setItem('smartoffice_username', data.username);
+                localStorage.setItem('smartoffice_userRole', data.role);
+
+                // Redirect to your main application page (index.html)
+                window.location.href = '/index.html';
+            } else {
+                console.error('Login failed response:', data);
+                errorMessageDiv.textContent = data.message || 'Login failed. Please check credentials.';
+            }
+        } catch (error) {
+            console.error('Login submission error:', error);
+            errorMessageDiv.textContent = 'An error occurred: Unable to connect to the server or unexpected response.';
+        }
+    });
+</script>
+</body>
+</html>
