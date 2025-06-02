@@ -42,6 +42,9 @@ const Navigation = () => {
             <Nav.Link onClick={() => handleNavClick('/parking')}>
               Parking
             </Nav.Link>
+            <Nav.Link onClick={() => handleNavClick('/conf-room')}>
+              Conf Room Bookings
+            </Nav.Link>
             {user?.role === 'ADMIN' && (
               <Nav.Link onClick={() => handleNavClick('/admin')}>
                 <FaUserShield className="me-1" />

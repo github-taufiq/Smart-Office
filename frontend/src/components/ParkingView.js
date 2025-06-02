@@ -1,307 +1,288 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Alert, Spinner } from 'react-bootstrap';
-import { ParkingProvider } from '../context/ParkingContext';
+import { Container, Row, Col, Card, Alert, Spinner, Badge, Button } from 'react-bootstrap';
+import { useParking } from '../context/ParkingContext';
+import { useAuth } from '../context/AuthContext';
 import ParkingSlot from './ParkingSlot';
+import { FaCar, FaParking, FaCalendarCheck, FaInfoCircle } from 'react-icons/fa';
 
 const ParkingView = () => {
-  const [parkingRows, setParkingRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { user } = useAuth();
+  const { 
+    slots, 
+    loading, 
+    fetchSlots, 
+    getAvailableSlotCount, 
+    getMyReservations 
+  } = useParking();
+  
+  const [stats, setStats] = useState({
+    available: 0,
+    occupied: 0,
+    reserved: 0,
+    outOfOrder: 0
+  });
+  const [myReservations, setMyReservations] = useState([]);
+  const [message, setMessage] = useState({ type: '', text: '' });
 
-  // Fetch parking rows from backend
   useEffect(() => {
-    fetchParkingRows();
+    loadParkingData();
   }, []);
 
-  const fetchParkingRows = async () => {
+  useEffect(() => {
+    if (slots.length > 0) {
+      calculateStats();
+    }
+  }, [slots]);
+
+  const loadParkingData = async () => {
     try {
-      setLoading(true);
-      // Fetch parking rows from backend
-      const response = await fetch('http://localhost:8080/api/parking/rows', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setParkingRows(data);
-        console.log('Fetched parking rows:', data);
-      } else {
-        throw new Error('Failed to fetch parking rows');
+      // Fetch slots
+      await fetchSlots();
+      
+      // Fetch user reservations
+      const reservationsResult = await getMyReservations();
+      if (reservationsResult.success) {
+        setMyReservations(reservationsResult.data);
       }
-    } catch (err) {
-      console.error('Error fetching parking rows:', err);
-      setError('Failed to load parking data. Please try again.');
-      // Optionally use mock data as fallback
-      setParkingRows(getMockParkingRows());
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      setMessage({ type: 'danger', text: 'Failed to load parking data' });
     }
   };
 
-  // Mock data as fallback
-  const getMockParkingRows = () => [
-    {
-      id: 1,
-      rowName: 'A',
-      floor: 'Ground Floor',
-      vehicleType: 'CAR',
-      slots: [
-        { id: 1, slotNumber: 'A001', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' },
-        { id: 2, slotNumber: 'A002', status: 'OCCUPIED', vehicleType: 'CAR', floor: 'Ground Floor', reservedByUser: 'John Doe' },
-        { id: 3, slotNumber: 'A003', status: 'RESERVED', vehicleType: 'CAR', floor: 'Ground Floor', reservedByUser: 'Jane Smith' },
-        { id: 4, slotNumber: 'A004', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' },
-        { id: 5, slotNumber: 'A005', status: 'OUT_OF_ORDER', vehicleType: 'CAR', floor: 'Ground Floor' },
-        { id: 6, slotNumber: 'A006', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' }
-      ]
-    },
-    {
-      id: 2,
-      rowName: 'B',
-      floor: 'Ground Floor',
-      vehicleType: 'CAR',
-      slots: [
-        { id: 7, slotNumber: 'B001', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' },
-        { id: 8, slotNumber: 'B002', status: 'OCCUPIED', vehicleType: 'CAR', floor: 'Ground Floor', reservedByUser: 'Mike Johnson' },
-        { id: 9, slotNumber: 'B003', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' },
-        { id: 10, slotNumber: 'B004', status: 'RESERVED', vehicleType: 'CAR', floor: 'Ground Floor', reservedByUser: 'Sarah Wilson' },
-        { id: 11, slotNumber: 'B005', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' },
-        { id: 12, slotNumber: 'B006', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'Ground Floor' }
-      ]
-    },
-    {
-      id: 3,
-      rowName: 'C',
-      floor: 'First Floor',
-      vehicleType: 'CAR',
-      slots: [
-        { id: 13, slotNumber: 'C001', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'First Floor' },
-        { id: 14, slotNumber: 'C002', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'First Floor' },
-        { id: 15, slotNumber: 'C003', status: 'OCCUPIED', vehicleType: 'CAR', floor: 'First Floor', reservedByUser: 'Tom Brown' },
-        { id: 16, slotNumber: 'C004', status: 'AVAILABLE', vehicleType: 'CAR', floor: 'First Floor' }
-      ]
-    },
-    {
-      id: 4,
-      rowName: 'M',
-      floor: 'Ground Floor',
-      vehicleType: 'MOTORCYCLE',
-      slots: [
-        { id: 17, slotNumber: 'M001', status: 'AVAILABLE', vehicleType: 'MOTORCYCLE', floor: 'Ground Floor' },
-        { id: 18, slotNumber: 'M002', status: 'OCCUPIED', vehicleType: 'MOTORCYCLE', floor: 'Ground Floor', reservedByUser: 'Alex Lee' },
-        { id: 19, slotNumber: 'M003', status: 'AVAILABLE', vehicleType: 'MOTORCYCLE', floor: 'Ground Floor' },
-        { id: 20, slotNumber: 'M004', status: 'AVAILABLE', vehicleType: 'MOTORCYCLE', floor: 'Ground Floor' }
-      ]
-    }
-  ];
-
-  const getAllSlots = () => {
-    return parkingRows.flatMap(row => row.slots || []);
-  };
-
-  const getStatusCounts = () => {
-    const allSlots = getAllSlots();
-    const counts = {
-      AVAILABLE: 0,
-      OCCUPIED: 0,
-      RESERVED: 0,
-      OUT_OF_ORDER: 0
+  const calculateStats = () => {
+    const newStats = {
+      available: 0,
+      occupied: 0,
+      reserved: 0,
+      outOfOrder: 0
     };
-    allSlots.forEach(slot => {
-      counts[slot.status] = (counts[slot.status] || 0) + 1;
-    });
-    return counts;
-  };
 
-  const groupRowsByFloor = () => {
-    const grouped = {};
-    parkingRows.forEach(row => {
-      const floor = row.floor || 'Ground Floor';
-      if (!grouped[floor]) {
-        grouped[floor] = [];
+    slots.forEach(slot => {
+      switch (slot.status) {
+        case 'AVAILABLE':
+          newStats.available++;
+          break;
+        case 'OCCUPIED':
+          newStats.occupied++;
+          break;
+        case 'RESERVED':
+          newStats.reserved++;
+          break;
+        case 'OUT_OF_ORDER':
+          newStats.outOfOrder++;
+          break;
+        default:
+          break;
       }
-      grouped[floor].push(row);
     });
-    return grouped;
+
+    setStats(newStats);
   };
 
-  if (loading) {
-    return (
-      <Container className="py-4 text-center">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading parking data...</span>
-        </Spinner>
-        <p className="mt-2">Loading parking data...</p>
-      </Container>
-    );
-  }
+  const refreshData = async () => {
+    setMessage({ type: '', text: '' });
+    await loadParkingData();
+    setMessage({ type: 'success', text: 'Parking data refreshed!' });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
 
-  if (error) {
+  if (loading && slots.length === 0) {
     return (
       <Container className="py-4">
-        <Alert variant="danger">
-          {error}
-          <div className="mt-2">
-            <button 
-              className="btn btn-outline-danger btn-sm"
-              onClick={fetchParkingRows}
-            >
-              Retry
-            </button>
-          </div>
-        </Alert>
+        <div className="text-center">
+          <Spinner animation="border" />
+          <p className="mt-2">Loading parking information...</p>
+        </div>
       </Container>
     );
   }
 
-  const statusCounts = getStatusCounts();
-  const groupedRows = groupRowsByFloor();
-
   return (
-    <ParkingProvider onRefresh={fetchParkingRows}>
-      <Container fluid className="py-4">
-        {/* Header */}
-        <Row className="mb-4">
-          <Col>
-            <h2>Parking Management</h2>
-            <p className="text-muted">Reserve and manage your parking spots</p>
-          </Col>
-        </Row>
+    <Container className="py-4">
+      {/* Header */}
+      <ParkingSlot />
+      <Row className="mb-4">
+        <Col>
+          <div className="d-flex justify-content-between align-items-center">
+            <div>
+              <h2>
+                <FaParking className="me-2" />
+                Parking Management
+              </h2>
+              <p className="text-muted">Welcome, {user?.name}! Manage your parking reservations.</p>
+            </div>
+            <Button variant="outline-primary" onClick={refreshData} disabled={loading}>
+              {loading ? <Spinner size="sm" className="me-2" /> : null}
+              Refresh
+            </Button>
+          </div>
+        </Col>
+      </Row>
 
-        {/* Status Summary */}
+      {/* Alert Messages */}
+      {message.text && (
+        <Alert variant={message.type} className="mb-4">
+          {message.text}
+        </Alert>
+      )}
+
+      {/* Statistics Cards */}
+      <Row className="mb-4">
+        <Col md={3}>
+          <Card className="text-center h-100">
+            <Card.Body>
+              <FaCar size={32} className="text-success mb-2" />
+              <h4 className="text-success">{stats.available}</h4>
+              <small className="text-muted">Available</small>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="text-center h-100">
+            <Card.Body>
+              <FaCar size={32} className="text-warning mb-2" />
+              <h4 className="text-warning">{stats.occupied}</h4>
+              <small className="text-muted">Occupied</small>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="text-center h-100">
+            <Card.Body>
+              <FaCar size={32} className="text-info mb-2" />
+              <h4 className="text-info">{stats.reserved}</h4>
+              <small className="text-muted">Reserved</small>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="text-center h-100">
+            <Card.Body>
+              <FaCar size={32} className="text-secondary mb-2" />
+              <h4 className="text-secondary">{stats.outOfOrder}</h4>
+              <small className="text-muted">Out of Order</small>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* My Reservations */}
+      {myReservations.length > 0 && (
         <Row className="mb-4">
           <Col>
             <Card>
+              <Card.Header>
+                <h5 className="mb-0">
+                  <FaCalendarCheck className="me-2" />
+                  My Current Reservations
+                </h5>
+              </Card.Header>
               <Card.Body>
-                <Row className="text-center">
-                  <Col md={3}>
-                    <Badge bg="success" className="p-2 fs-6">
-                      Available: {statusCounts.AVAILABLE}
-                    </Badge>
-                  </Col>
-                  <Col md={3}>
-                    <Badge bg="warning" className="p-2 fs-6">
-                      Occupied: {statusCounts.OCCUPIED}
-                    </Badge>
-                  </Col>
-                  <Col md={3}>
-                    <Badge bg="info" className="p-2 fs-6">
-                      Reserved: {statusCounts.RESERVED}
-                    </Badge>
-                  </Col>
-                  <Col md={3}>
-                    <Badge bg="secondary" className="p-2 fs-6">
-                      Out of Order: {statusCounts.OUT_OF_ORDER}
-                    </Badge>
-                  </Col>
+                <Row>
+                  {myReservations.map(reservation => (
+                    <Col key={reservation.id} md={6} lg={4} className="mb-2">
+                      <div className="d-flex align-items-center">
+                        <Badge bg="info" className="me-2">
+                          Slot {reservation.slotNumber}
+                        </Badge>
+                        <small className="text-muted">
+                          Reserved until {new Date(reservation.reservedUntil).toLocaleString()}
+                        </small>
+                      </div>
+                    </Col>
+                  ))}
                 </Row>
               </Card.Body>
             </Card>
           </Col>
         </Row>
+      )}
 
-        {/* Parking Rows by Floor */}
-        {Object.entries(groupedRows).map(([floor, rows]) => (
-          <div key={floor} className="mb-5">
-            <h4 className="mb-3">{floor}</h4>
-            
-            {rows.map((row) => (
-              <Card key={row.id} className="mb-3">
-                <Card.Header>
-                  <h6 className="mb-0">
-                    Row {row.rowName}
-                    {row.vehicleType === 'MOTORCYCLE' && (
-                      <Badge bg="info" className="ms-2">Motorcycle Section</Badge>
-                    )}
-                    <span className="text-muted ms-2">
-                      ({row.slots?.length || 0} slots)
-                    </span>
-                  </h6>
-                </Card.Header>
-                <Card.Body>
-                  <Row className="g-2">
-                    {(row.slots || []).map(slot => (
-                      <Col key={slot.id} xs={6} sm={4} md={3} lg={2}>
-                        <ParkingSlot slot={slot} />
-                      </Col>
-                    ))}
-                  </Row>
-                </Card.Body>
-              </Card>
-            ))}
-          </div>
-        ))}
+      {/* Instructions */}
+      <Row className="mb-4">
+        <Col>
+          <Alert variant="info">
+            <FaInfoCircle className="me-2" />
+            <strong>How to use:</strong>
+            <ul className="mb-0 mt-2">
+              <li>Click on an <Badge bg="success">Available</Badge> slot to reserve it</li>
+              <li>Click on your <Badge bg="info">Reserved</Badge> slot to check in</li>
+              <li>Use the "Reserve" button to confirm your selection</li>
+              <li>Use the "Cancel" button to cancel your selection</li>
+            </ul>
+          </Alert>
+        </Col>
+      </Row>
 
-        {/* Legend */}
-        <Row className="mt-4">
-          <Col>
-            <Card>
-              <Card.Header>
-                <h6 className="mb-0">Legend</h6>
-              </Card.Header>
-              <Card.Body>
-                <div className="d-flex flex-wrap gap-3 justify-content-center">
-                  <div className="d-flex align-items-center">
-                    <div 
-                      className="me-2" 
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: '#d1e7dd',
-                        border: '2px solid #198754',
-                        borderRadius: '4px'
-                      }}
-                    ></div>
-                    <span>Available - Click to Reserve</span>
+      {/* Parking Slots Grid */}
+      <Row className="mb-4">
+        <Col>
+          <Card>
+            <Card.Header>
+              <h5 className="mb-0">Parking Slots</h5>
+            </Card.Header>
+            <Card.Body>
+              {slots.length === 0 ? (
+                <Alert variant="warning">
+                  No parking slots available. Please contact the administrator.
+                </Alert>
+              ) : (
+                <Row className="g-3">
+                  {slots.map(slot => (
+                    <Col key={slot.id} xs={12} sm={6} md={4} lg={3}>
+                      <ParkingSlot slot={slot} />
+                    </Col>
+                  ))}
+                </Row>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Legend */}
+      <Row>
+        <Col>
+          <Card>
+            <Card.Header>
+              <h6 className="mb-0">Legend</h6>
+            </Card.Header>
+            <Card.Body>
+              <Row className="text-center">
+                <Col xs={6} md={3}>
+                  <div className="p-2 border rounded" style={{ backgroundColor: '#d1e7dd', borderColor: '#198754' }}>
+                    <Badge bg="success">Available</Badge>
+                    <br />
+                    <small className="text-muted">Click to reserve</small>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <div 
-                      className="me-2" 
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: '#fff3cd',
-                        border: '2px solid #fd7e14',
-                        borderRadius: '4px'
-                      }}
-                    ></div>
-                    <span>Occupied</span>
+                </Col>
+                <Col xs={6} md={3}>
+                  <div className="p-2 border rounded" style={{ backgroundColor: '#fff3cd', borderColor: '#fd7e14' }}>
+                    <Badge bg="warning">Occupied</Badge>
+                    <br />
+                    <small className="text-muted">Currently in use</small>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <div 
-                      className="me-2" 
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: '#d1ecf1',
-                        border: '2px solid #0dcaf0',
-                        borderRadius: '4px'
-                      }}
-                    ></div>
-                    <span>Reserved - Click to Check In</span>
+                </Col>
+                <Col xs={6} md={3}>
+                  <div className="p-2 border rounded" style={{ backgroundColor: '#d1ecf1', borderColor: '#0dcaf0' }}>
+                    <Badge bg="info">Reserved</Badge>
+                    <br />
+                    <small className="text-muted">Click to check in</small>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <div 
-                      className="me-2" 
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: '#cfe2ff',
-                        border: '2px solid #0d6efd',
-                        borderRadius: '4px'
-                      }}
-                    ></div>
-                    <span>Selected for Reservation</span>
+                </Col>
+                <Col xs={6} md={3}>
+                  <div className="p-2 border rounded" style={{ backgroundColor: '#e2e3e5', borderColor: '#6c757d' }}>
+                    <Badge bg="secondary">Out of Order</Badge>
+                    <br />
+                    <small className="text-muted">Not available</small>
                   </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </ParkingProvider>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

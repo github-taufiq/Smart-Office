@@ -192,6 +192,25 @@ Release Slot: Calls POST /api/parking/slots/{slotId}/release
 Update Slot Status: Calls PUT /api/parking/slots/{slotId}/status
 Get User Reservations: Calls GET /api/parking/reservations/user/{userId}
 
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── Navbar.js
+│   │   ├── Login.js
+│   │   ├── Register.js
+│   │   ├── Dashboard.js
+│   │   ├── ParkingView.js
+│   │   ├── ProtectedRoute.js
+│   │   ├── BookingView.js
+│   │   ├── BookingForm.js
+│   │   ├── MyBookings.js
+│   │   ├── PendingApprovals.js
+│   │   └── OfficeBookings.js
+│   ├── context/
+│   │   ├── AuthContext.js
+│   │   └── BookingContext.js
+│   ├── App.js
+│   └── index.js
 
 #### Database Setup
 ```sql

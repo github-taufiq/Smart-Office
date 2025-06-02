@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Alert, Row, Col } from 'react-bootstrap';
 import { FaPlus } from 'react-icons/fa';
-import ParkingSlotList from './parking/ParkingSlotList';
-import ParkingSlotForm from './parking/ParkingSlotForm';
-import ParkingAnalytics from './parking/ParkingAnalytics';
+import ParkingSlot from '../ParkingSlot';
+// import ParkingSlotForm from './parking/ParkingSlotForm';
+// import ParkingAnalytics from './parking/ParkingAnalytics';
 
 const ParkingManagement = () => {
   const [parkingSlots, setParkingSlots] = useState([]);
@@ -77,19 +77,19 @@ const ParkingManagement = () => {
         </Button>
       </div>
 
-      {alert && (
+      {/* {alert && (
         <Alert variant={alert.type} dismissible onClose={() => setAlert(null)}>
           {alert.message}
         </Alert>
-      )}
+      )} */}
 
-      <Row className="mb-4">
+      {/* <Row className="mb-4">
         <Col>
           <ParkingAnalytics slots={parkingSlots} />
         </Col>
-      </Row>
+      </Row> */}
 
-      {showForm ? (
+      {/* {showForm ? (
         <ParkingSlotForm
           onSave={handleSaveSlot}
           onCancel={() => {
@@ -104,7 +104,7 @@ const ParkingManagement = () => {
           onEdit={handleEditSlot}
           onDelete={handleDeleteSlot}
         />
-      )}
+      )} */}
     </div>
   );
 };

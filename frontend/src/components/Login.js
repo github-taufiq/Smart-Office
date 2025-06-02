@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const { login, loading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const { login, isAuthenticated } = useAuth();
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      console.log('Login - user already authenticated, redirecting');
-      window.location.href = '/';
+    if (isAuthenticated()) {
+      navigate('/');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
-  const handleChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -30,29 +29,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setMessage({ type: '', text: '' });
 
-    console.log('Login - form submitted with:', formData.email);
-
-    try {
-      const result = await login(formData.email, formData.password);
-      console.log('Login - result:', result);
-      
-      if (result.success) {
-        console.log('Login - success, redirecting to dashboard');
-        // Add a small delay to ensure state is updated
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
-      } else {
-        setError(result.error || 'Login failed');
-      }
-    } catch (err) {
-      console.error('Login - error:', err);
-      setError('An error occurred during login');
-    } finally {
-      setLoading(false);
+    const result = await login(formData);
+    if (result.success) {
+      navigate('/');
+    } else {
+      setMessage({ type: 'danger', text: result.error });
     }
   };
 
@@ -67,9 +50,9 @@ const Login = () => {
                 <p className="text-muted">Sign in to your account</p>
               </div>
 
-              {error && (
-                <Alert variant="danger" className="mb-3">
-                  {error}
+              {message.text && (
+                <Alert variant={message.type} className="mb-3">
+                  {message.text}
                 </Alert>
               )}
 
@@ -80,9 +63,9 @@ const Login = () => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
-                    required
+                    onChange={handleInputChange}
                     placeholder="Enter your email"
+                    required
                   />
                 </Form.Group>
 
@@ -92,26 +75,33 @@ const Login = () => {
                     type="password"
                     name="password"
                     value={formData.password}
-                    onChange={handleChange}
-                    required
+                    onChange={handleInputChange}
                     placeholder="Enter your password"
+                    required
                   />
                 </Form.Group>
 
-                <Button
-                  variant="primary"
-                  type="submit"
+                <Button 
+                  type="submit" 
+                  variant="primary" 
                   className="w-100"
                   disabled={loading}
                 >
-                  {loading ? 'Signing in...' : 'Sign In'}
+                  {loading ? (
+                    <>
+                      <Spinner size="sm" className="me-2" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
                 </Button>
               </Form>
 
-              <div className="mt-3 text-center">
-                <small className="text-muted">
-                  Demo: Use <strong>admin@company.com</strong> for admin access or <strong>user@company.com</strong> for employee access. Any password works.
-                </small>
+              <div className="text-center mt-3">
+                <p className="mb-0">
+                  Don't have an account? <Link to="/register">Sign up</Link>
+                </p>
               </div>
             </Card.Body>
           </Card>

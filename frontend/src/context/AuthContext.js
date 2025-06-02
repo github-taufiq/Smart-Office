@@ -12,80 +12,129 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(null);
 
+  // Initialize auth state from localStorage on app start
   useEffect(() => {
-    console.log('AuthProvider - checking existing auth');
-    // Check if user is logged in on app start
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    console.log('AuthProvider - token:', token, 'userData:', userData);
-    
-    if (token && userData) {
+    const initializeAuth = () => {
       try {
-        const parsedUser = JSON.parse(userData);
-        console.log('AuthProvider - parsed user:', parsedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedToken && storedUser) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+        }
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        console.error('Error initializing auth:', error);
+        // Clear invalid data
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
-    console.log('AuthProvider - initialization complete');
+    };
+
+    initializeAuth();
   }, []);
 
-  const login = async (email, password) => {
-    console.log('AuthProvider - login attempt:', email);
+  const login = async (credentials) => {
     try {
-      // Mock login - replace with actual API call
-      const mockUser = {
-        id: 1,
-        name: email === 'admin@company.com' ? 'Admin User' : 'John Doe',
-        email: email,
-        role: email === 'admin@company.com' ? 'ADMIN' : 'EMPLOYEE',
-        department: 'IT'
-      };
+      setLoading(true);
       
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      
-      console.log('AuthProvider - setting user data:', mockUser);
-      
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      
-      console.log('AuthProvider - login successful');
-      return { success: true };
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Store token and user data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        setToken(data.token);
+        setUser(data.user);
+        
+        return { success: true, data };
+      } else {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message || 'Login failed' };
+      }
     } catch (error) {
-      console.error('AuthProvider - login error:', error);
-      return { success: false, error: error.message };
+      console.error('Login error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (userData) => {
+    try {
+      setLoading(true);
+      
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return { success: true, data };
+      } else {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message || 'Registration failed' };
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
-    console.log('AuthProvider - logout');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setToken(null);
     setUser(null);
-    setIsAuthenticated(false);
+  };
+
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  const isAuthenticated = () => {
+    return !!token && !!user;
+  };
+
+  const getAuthHeaders = () => {
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
   };
 
   const value = {
     user,
-    isAuthenticated,
+    token,
     loading,
     login,
-    logout
+    register,
+    logout,
+    updateUser,
+    isAuthenticated,
+    getAuthHeaders
   };
-
-  console.log('AuthProvider - current state:', { user, isAuthenticated, loading });
 
   return (
     <AuthContext.Provider value={value}>
