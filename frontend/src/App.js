@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import ParkingDashboard from './pages/ParkingDashboard'; // Import the actual component
 import { ParkingProvider } from './context/ParkingContext'; // Import the context provider
+import AdminDashboard from './components/admin/AdminDashboard';
 
 const Home = () => (
   <div className="container mt-4">
@@ -12,10 +13,10 @@ const Home = () => (
   </div>
 );
 
-const AddParking = () => (
+const Dashboard = () => (
   <div className="container mt-4">
-    <h2>Add Parking</h2>
-    <p>Add parking functionality coming soon...</p>
+    <h2>Dashboard</h2>
+    <p>Dashboard</p>
   </div>
 );
 
@@ -34,12 +35,13 @@ const Navigation = () => (
     </div>
   <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
     <div className="container">
-      <a className="navbar-brand" href="/">Parking System</a>
+      <a className="navbar-brand" href="/">Smart Office System</a>
       <div className="navbar-nav">
         <a className="nav-link" href="/">Home</a>
+        <a className="nav-link" href="/conf-room">Conference Room</a>
         <a className="nav-link" href="/parking">Parking</a>
-        <a className="nav-link" href="/add-parking">Add Parking</a>
-        <a className="nav-link" href="/reports">Reports</a>
+        <a className="nav-link" href="/dashboard">Dashboard</a>
+        {/* <a className="nav-link" href="/reports">Reports</a> */}
       </div>
     </div>
   </nav>
@@ -55,7 +57,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/parking" element={<ParkingDashboard />} />
-            <Route path="/add-parking" element={<AddParking />} />
+            <Route path="/dashboard" element={<AdminDashboard />} />
             <Route path="/reports" element={<Reports />} />
           </Routes>
         </div>

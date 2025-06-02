@@ -1,76 +1,83 @@
 import React from 'react';
-import { Navbar, Nav, Container, Breadcrumb } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import { useLocation } from 'react-router-dom';
-import { FaCar, FaPlus, FaChartBar, FaHome } from 'react-icons/fa';
+import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
+import { useAuth } from '../context/AuthContext';
+import { FaUser, FaCog, FaSignOutAlt, FaUserShield } from 'react-icons/fa';
 
 const Navigation = () => {
-  const location = useLocation();
+  const { user, logout, isAuthenticated } = useAuth();
 
-  const getBreadcrumbs = () => {
-    const path = location.pathname;
-    const breadcrumbs = [{ name: 'Home', path: '/', icon: <FaHome /> }];
+  console.log('Navigation - isAuthenticated:', isAuthenticated, 'user:', user);
 
-    if (path.includes('/parking')) {
-      breadcrumbs.push({ name: 'Parking Management', path: '/parking' });
-    }
-    if (path.includes('/add-parking')) {
-      breadcrumbs.push({ name: 'Add Parking', path: '/add-parking' });
-    }
-    if (path.includes('/reports')) {
-      breadcrumbs.push({ name: 'Reports', path: '/reports' });
-    }
-
-    return breadcrumbs;
+  const handleLogout = () => {
+    console.log('Navigation - logout clicked');
+    logout();
+    window.location.href = '/login';
   };
 
-  return (
-    <>
-      <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
-        <Container>
-          <Navbar.Brand href="/">
-            <FaCar className="me-2" />
-            Smart Office - Parking System
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <LinkContainer to="/parking">
-                <Nav.Link>
-                  <FaCar className="me-1" />
-                  Parking Slots
-                </Nav.Link>
-              </LinkContainer>
-              <LinkContainer to="/add-parking">
-                <Nav.Link>
-                  <FaPlus className="me-1" />
-                  Add Parking
-                </Nav.Link>
-              </LinkContainer>
-              <LinkContainer to="/reports">
-                <Nav.Link>
-                  <FaChartBar className="me-1" />
-                  Reports
-                </Nav.Link>
-              </LinkContainer>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+  const handleNavClick = (path) => {
+    window.location.href = path;
+  };
 
+  if (!isAuthenticated) {
+    console.log('Navigation - not authenticated, not rendering');
+    return null;
+  }
+
+  return (
+    <Navbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Breadcrumb>
-          {getBreadcrumbs().map((crumb, index) => (
-            <LinkContainer key={index} to={crumb.path}>
-              <Breadcrumb.Item active={index === getBreadcrumbs().length - 1}>
-                {crumb.icon && <span className="me-1">{crumb.icon}</span>}
-                {crumb.name}
-              </Breadcrumb.Item>
-            </LinkContainer>
-          ))}
-        </Breadcrumb>
+        <Navbar.Brand 
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleNavClick('/')}
+        >
+          Smart Office
+        </Navbar.Brand>
+        
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link onClick={() => handleNavClick('/')}>
+              Dashboard
+            </Nav.Link>
+            <Nav.Link onClick={() => handleNavClick('/parking')}>
+              Parking
+            </Nav.Link>
+            {user?.role === 'ADMIN' && (
+              <Nav.Link onClick={() => handleNavClick('/admin')}>
+                <FaUserShield className="me-1" />
+                Administration
+              </Nav.Link>
+            )}
+          </Nav>
+          
+          <Nav>
+            <NavDropdown 
+              title={
+                <span>
+                  <FaUser className="me-1" />
+                  {user?.name || 'User'}
+                </span>
+              } 
+              id="user-dropdown"
+            >
+              <NavDropdown.Item>
+                <FaUser className="me-2" />
+                Profile
+              </NavDropdown.Item>
+              <NavDropdown.Item>
+                <FaCog className="me-2" />
+                Settings
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={handleLogout}>
+                <FaSignOutAlt className="me-2" />
+                Logout
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
       </Container>
-    </>
+    </Navbar>
   );
 };
 
