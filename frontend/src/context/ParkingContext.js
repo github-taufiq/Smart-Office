@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { parkingAPI } from '../services/api';
 import { mockParkingData } from '../services/mockData';
+import { useAuth } from './AuthContext';
 
 const ParkingContext = createContext();
 
@@ -256,8 +257,10 @@ export const ParkingProvider = ({ children }) => {
         return;
       }
 
+      // const { user, isAuthenticated } = useAuth();
       // Call the reserve API endpoint instead of updateSlotStatus
-      await parkingAPI.reserveSlot(slotId, 'admin'); // You'll need to implement this in your API service
+      // console.log("User:", user);
+      await parkingAPI.reserveSlot(slotId, 'user1'); // You'll need to implement this in your API service
     
       // Refresh data and clear editing state
       await fetchRows();
