@@ -49,7 +49,6 @@ public class BookingController {
         return ResponseEntity.ok(availableRooms);
     }
 
-
     @GetMapping("/pending")
     @PreAuthorize("hasAnyRole('OFFICE_ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<List<BookingResponseDto>> getPendingBookingsForMyOffice() {

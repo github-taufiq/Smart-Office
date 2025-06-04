@@ -27,15 +27,8 @@ public class AttendanceService {
 
     @Transactional
     public AttendanceResponseDto markAttendance(AttendanceRequestDto requestDto) throws BadRequestException {
-        // Extract user details from JWT (assuming it's configured in SecurityConfig)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName(); // Or get a custom UserPrincipal object
-        // String username = ((UserPrincipal) authentication.getPrincipal()).getUsername(); // If using custom Principal
-
-        // For simplicity, let's assume username can be fetched or is part of the principal.
-        // In a real scenario, if username isn't in the token and needed, an API call to a User service might be required.
-        // Or, for this microservice, maybe only userId is strictly necessary for records.
-        // Let's simulate getting username if your UserPrincipal has it.
         String username = "User-" + userId; // Placeholder - replace with actual username retrieval
         if (authentication.getPrincipal() instanceof UserPrincipal) { // Assuming you have a UserPrincipal class
             username = ((UserPrincipal) authentication.getPrincipal()).getUsernameForRecord();
@@ -44,9 +37,7 @@ public class AttendanceService {
 
         LocalDate today = LocalDate.now();
         if (!requestDto.getAttendanceDate().isEqual(today)) {
-            // Allow marking for today only for regular users? Admins might edit past.
-            // For now, let's assume user marks for the date provided.
-            // Consider business rules around backdated/future attendance marking.
+            throw new BadRequestException("Attendance can only be marked for today: " + today);
         }
 
         // Check if attendance for this user and date already exists
@@ -54,9 +45,7 @@ public class AttendanceService {
 
         AttendanceRecord attendanceRecord;
         if (existingRecordOpt.isPresent()) {
-            // Update existing record (e.g., user initially marked WFH then came to office, or adding checkout time)
             attendanceRecord = existingRecordOpt.get();
-            // Potentially disallow changing from ON_LEAVE to WFO/WFH easily or vice-versa without admin intervention
             if (attendanceRecord.getStatus() == AttendanceStatus.ON_LEAVE &&
                     (requestDto.getStatus() == AttendanceStatus.WFO || requestDto.getStatus() == AttendanceStatus.WFH)) {
                 throw new BadRequestException("Cannot change from ON_LEAVE without proper channels. Current status: " + attendanceRecord.getStatus());
@@ -72,14 +61,13 @@ public class AttendanceService {
             case WFO:
                 attendanceRecord.setLeaveType(null);
                 attendanceRecord.setLeaveReason(null);
-                // If checkInTime is not provided and method is not MANUAL, it might be set by an auto-checkin trigger.
-                // For manual marking, user might provide checkInTime.
+
                 if (requestDto.getCheckInTime() != null) {
                     attendanceRecord.setCheckInTime(requestDto.getCheckInTime());
                 } else if (attendanceRecord.getCheckInTime() == null && (requestDto.getCheckInMethod() == CheckInMethod.MANUAL || requestDto.getCheckInMethod() == null)) {
-                    attendanceRecord.setCheckInTime(LocalTime.now()); // Default if marking WFO manually now
+                    attendanceRecord.setCheckInTime(LocalTime.now());
                 }
-                if (requestDto.getCheckOutTime() != null) { // User is checking out or correcting
+                if (requestDto.getCheckOutTime() != null) {
                     attendanceRecord.setCheckOutTime(requestDto.getCheckOutTime());
                 }
                 attendanceRecord.setCheckInMethod(requestDto.getCheckInMethod() != null ? requestDto.getCheckInMethod() : CheckInMethod.MANUAL);
@@ -88,7 +76,7 @@ public class AttendanceService {
             case WFH:
                 attendanceRecord.setLeaveType(null);
                 attendanceRecord.setLeaveReason(null);
-                attendanceRecord.setCheckInTime(null); // Or set a default WFH start time
+                attendanceRecord.setCheckInTime(null);
                 attendanceRecord.setCheckOutTime(null);
                 attendanceRecord.setCheckInMethod(null);
                 attendanceRecord.setModeOfTransport(null);
@@ -112,8 +100,6 @@ public class AttendanceService {
         return mapToResponseDto(savedRecord);
     }
 
-    // Method for auto check-in (e.g., triggered by QR scan, geofence)
-    // This would likely be called by a different endpoint or internal mechanism
     @Transactional
     public AttendanceResponseDto recordAutoCheckIn(String userId, String username, LocalDate date, LocalTime time, CheckInMethod method, String modeOfTransport) {
         Optional<AttendanceRecord> existingRecordOpt = attendanceRecordRepository.findByUserIdAndAttendanceDate(userId, date);

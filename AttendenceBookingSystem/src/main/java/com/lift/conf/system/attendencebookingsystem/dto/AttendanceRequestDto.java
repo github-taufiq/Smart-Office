@@ -3,20 +3,26 @@ package com.lift.conf.system.attendencebookingsystem.dto;
 import com.lift.conf.system.attendencebookingsystem.model.AttendanceStatus;
 import com.lift.conf.system.attendencebookingsystem.model.CheckInMethod;
 import com.lift.conf.system.attendencebookingsystem.model.LeaveType;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.LocalDate;
 import java.time.LocalTime; // For check-in/out if provided manually
 
 public class AttendanceRequestDto {
-    @NotNull(message = "Attendance date cannot be null")
-    private LocalDate attendanceDate; // Usually today's date, but allow for corrections by admin?
 
+    @NotNull(message = "Attendance date cannot be null")
+    @PastOrPresent(message = "Attendance date must be today or in the past")
+    private LocalDate attendanceDate;
     @NotNull(message = "Attendance status cannot be null")
     private AttendanceStatus status;
-
-    // For ON_LEAVE status
     private LeaveType leaveType;
+    private String leaveReason;
+    private LocalTime checkInTime;
+    private LocalTime checkOutTime;
+    private CheckInMethod checkInMethod;
+    private String modeOfTransport;
 
     public @NotNull(message = "Attendance date cannot be null") LocalDate getAttendanceDate() {
         return attendanceDate;
@@ -82,16 +88,5 @@ public class AttendanceRequestDto {
         this.modeOfTransport = modeOfTransport;
     }
 
-    private String leaveReason;
 
-    // For WFO status
-    private LocalTime checkInTime; // Optional: can be auto-set by system on auto check-in
-    private LocalTime checkOutTime; // Optional: for manual checkout or updates
-    private CheckInMethod checkInMethod; // If WFO, how was it marked? (e.g., MANUAL if user is just submitting the form)
-    private String modeOfTransport;
-
-    // For auto check-in methods, additional data might be sent:
-    // private String qrCodeData;
-    // private GeoLocationDto locationData;
-    // private String wifiNetworkId; // If applicable
 }

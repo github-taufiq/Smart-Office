@@ -29,7 +29,6 @@ public class AttendanceController {
 
     @PostMapping("/mark")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('OFFICE_ADMIN') or hasRole('MANAGER')")
-    // Or just EMPLOYEE if admins use a different system for corrections
     public ResponseEntity<AttendanceResponseDto> markAttendance(@Valid @RequestBody AttendanceRequestDto attendanceRequestDto) throws BadRequestException {
         AttendanceResponseDto responseDto = attendanceService.markAttendance(attendanceRequestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
@@ -40,7 +39,6 @@ public class AttendanceController {
     public ResponseEntity<List<AttendanceResponseDto>> getMyAttendanceRecords(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        // Users can only fetch their own. Service layer enforces this based on authenticated principal.
         List<AttendanceResponseDto> records = attendanceService.getMyAttendanceForPeriod(startDate, endDate);
         return ResponseEntity.ok(records);
     }
@@ -74,7 +72,7 @@ public class AttendanceController {
         return ResponseEntity.ok(dailyLog);
     }
 
-    @PostMapping("/auto-checkin/qr-dynamic") // New distinct path
+    @PostMapping("/auto-checkin/qr-dynamic")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<AttendanceResponseDto> autoCheckInViaDynamicQr(
             @Valid @RequestBody DynamicQrPayloadDto qrPayload,
@@ -85,62 +83,42 @@ public class AttendanceController {
         String authenticatedUsernameForRecord = "User"; // Default
 
         if (authentication.getPrincipal() instanceof UserPrincipal principal) {
-            // Assuming UserPrincipal.getActualUserId() gives the Employee ID
-            // And UserPrincipal.getUsername() gives the login username
-            // Or UserPrincipal.getName() is configured to return the Employee ID
-            authenticatedUserIdFromToken = principal.getActualUserId(); // Or principal.getName() if that's the Employee ID
-            authenticatedUsernameForRecord = principal.getUsernameForRecord(); // e.g. principal.getFullName() or principal.getUsername()
+            authenticatedUserIdFromToken = principal.getActualUserId();
+            authenticatedUsernameForRecord = principal.getUsernameForRecord();
         } else {
-            // Fallback if UserPrincipal is not used, assuming getName() is the Employee ID
             authenticatedUserIdFromToken = authentication.getName();
             authenticatedUsernameForRecord = "User-" + authenticatedUserIdFromToken;
         }
 
-        // Critical Validation: User ID in QR payload must match the authenticated user's ID from token
         if (!qrPayload.getUserId().equals(authenticatedUserIdFromToken)) {
-            // Log this attempt - potential misuse
             System.err.println("Security Alert: QR User ID mismatch. QR_User: " + qrPayload.getUserId() + ", Token_User: " + authenticatedUserIdFromToken);
             throw new BadRequestException("QR code mismatch: This QR code is not for the currently logged-in user.");
         }
 
-        // Validate QR type
         if (!"OFFICE_GATE_CHECKIN".equals(qrPayload.getType())) {
             throw new BadRequestException("Invalid QR code type specified.");
         }
 
-        // Validate timestamp freshness (e.g., QR code valid for 5 minutes from its generation time)
         try {
             OffsetDateTime qrTimestamp = OffsetDateTime.parse(qrPayload.getTimestamp());
             OffsetDateTime currentUtcTime = OffsetDateTime.now(ZoneOffset.UTC);
             Duration timeDifference = Duration.between(qrTimestamp, currentUtcTime);
 
-            // QR timestamp should not be in the future, and not too old
             if (timeDifference.isNegative() || timeDifference.toMinutes() > 5) {
                 throw new BadRequestException("QR code has expired or its timestamp is invalid.");
             }
         } catch (Exception e) {
-            // Log parsing error
             System.err.println("Error parsing QR timestamp: " + qrPayload.getTimestamp() + " - " + e.getMessage());
             throw new BadRequestException("Invalid QR code timestamp format. Expected ISO 8601 UTC.");
         }
-
-        // Optional: Nonce validation (if you implement a cache for recently used nonces to prevent replay attacks)
-        // if (nonceCacheService.isNonceUsed(qrPayload.getNonce())) {
-        //     throw new BadRequestException("QR code has already been processed (nonce reuse).");
-        // }
-        // nonceCacheService.markNonceAsUsed(qrPayload.getNonce());
-
-
-        // If all validations pass, proceed to record attendance
         AttendanceResponseDto responseDto = attendanceService.recordAutoCheckIn(
-                authenticatedUserIdFromToken,    // Use the validated user ID from token
-                authenticatedUsernameForRecord,  // Username for record
-                LocalDate.now(),                 // Check-in is for the current date
-                LocalTime.now(),                 // Check-in is at the current time
-                CheckInMethod.QR_CODE,           // Method is QR Code
-                modeOfTransport                  // Optional mode of transport
+                authenticatedUserIdFromToken,
+                authenticatedUsernameForRecord,
+                LocalDate.now(),
+                LocalTime.now(),
+                CheckInMethod.QR_CODE,
+                modeOfTransport
         );
-
         return ResponseEntity.ok(responseDto);
     }
 }

@@ -149,7 +149,7 @@
         }
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch('http://localhost:8083/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -166,7 +166,7 @@
                 localStorage.setItem('smartoffice_userRole', data.role);
 
                 // Redirect to your main application page (index.html)
-                window.location.href = '/index.html';
+                window.location.href = 'Index.html';
             } else {
                 console.error('Login failed response:', data);
                 errorMessageDiv.textContent = data.message || 'Login failed. Please check credentials.';

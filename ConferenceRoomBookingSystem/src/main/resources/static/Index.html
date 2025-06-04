@@ -2,510 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>SmartOffice - Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartOffice Dashboard - Rooms</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7f6;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
+            padding: 0;
         }
-
         header {
-            background-color: #3498db;
-            color: white;
-            padding: 15px 25px;
+            background: #3498db;
+            color: #fff;
+            padding: 24px 0;
             text-align: center;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
         }
-
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        nav a {
-            color: white;
-            margin: 0 10px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
         .container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            margin: 40px auto;
+            max-width: 900px;
         }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #34495e;
-        }
-
-        select, input[type="text"], input[type="date"], input[type="time"], button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 18px;
-            border-radius: 6px;
-            border: 1px solid #bdc3c7;
-            box-sizing: border-box;
-            font-size: 15px;
-        }
-
-        input[type="text"], input[type="date"], input[type="time"] {
-            width: calc(100% - 24px);
-        }
-
-        /* Account for padding */
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22/%3E%3C/svg%3E');
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 12px auto;
-            padding-right: 30px;
-        }
-
-        button {
-            background-color: #2ecc71;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            border: none;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #27ae60;
-        }
-
-        button.book-room-btn {
-            background-color: #3498db;
-            margin-top: 5px;
-            padding: 8px 12px;
-            font-size: 14px;
-        }
-
-        button.book-room-btn:hover {
-            background-color: #2980b9;
-        }
-
-        .office-section {
-            margin-top: 25px;
-            border: 1px solid #ecf0f1;
-            padding: 20px;
-            border-radius: 6px;
-            background-color: #f9fafb;
-        }
-
-        .office-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #ecf0f1;
-            padding-bottom: 8px;
-        }
-
-        .room-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .room-list li {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .room-list li strong {
-            display: block;
-            color: #34495e;
-            font-size: 17px;
-            margin-bottom: 5px;
-        }
-
-        .room-list li span {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-right: 10px;
-        }
-
-        .room-list li p.description {
-            font-size: 14px;
-            color: #555;
-            margin-top: 8px;
-        }
-
-        #loadingMessage, #errorMessage {
+        .block {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            padding: 36px 32px;
+            width: 280px;
             text-align: center;
-            padding: 12px;
-            margin-top: 15px;
+            transition: box-shadow 0.2s;
+        }
+        .block:hover {
+            box-shadow: 0 8px 24px rgba(52,152,219,0.15);
+        }
+        .block h2 {
+            color: #2c3e50;
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+        }
+        .block p {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .block button {
+            background: #3498db;
+            color: #fff;
+            border: none;
             border-radius: 6px;
-            font-weight: 500;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-
-        #loadingMessage {
-            color: #3498db;
-            background-color: #eaf5ff;
-            border: 1px solid #aed6f1;
+        .block button:hover {
+            background: #2980b9;
         }
-
-        #errorMessage {
-            color: #e74c3c;
-            background-color: #fdedec;
-            border: 1px solid #f5b7b1;
-        }
-
-        .user-info {
-            color: white;
-            font-size: 14px;
-        }
-
-        .logout-button {
-            background-color: #e74c3c;
-            font-size: 14px;
-            padding: 8px 15px;
-            width: auto;
-        }
-
-        .logout-button:hover {
-            background-color: #c0392b;
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
 <body>
-
 <header>
-    <h1>SmartOffice</h1>
-    <div class="user-info">
-        Logged in as: <span id="loggedInUsername">Guest</span> (<span id="loggedInUserRole">N/A</span>)
-    </div>
-    <nav>
-        <a href="/index.html">Find Rooms</a>
-        <a href="/my_bookings.html">My Bookings</a>
-        <button class="logout-button" onclick="logout()">Logout</button>
-    </nav>
+    SmartOffice Portal
 </header>
-
 <div class="container">
-    <h2>Explore Conference Rooms</h2>
-
-    <div>
-        <label for="citySelect">Select City:</label>
-        <select id="citySelect">
-            <option value="">-- Loading Cities --</option>
-        </select>
+    <div class="block">
+        <h2>Parking Lot Booking</h2>
+        <p>Reserve your parking spot in advance and avoid last-minute hassle.</p>
+        <button onclick="window.location.href='parking.html'">Book Parking</button>
     </div>
-
-    <div id="officesContainer">
+    <div class="block">
+        <h2>Conference Room Booking</h2>
+        <p>Find and book available conference rooms for your meetings.</p>
+        <button onclick="window.location.href='conference.html'">Book Conference Room</button>
     </div>
-
-    <div id="loadingMessage" style="display: none;">Loading...</div>
-    <div id="errorMessage" style="display: none;"></div>
+    <div class="block">
+        <h2>Attendance Marking</h2>
+        <p>Mark your daily attendance or check your attendance records.</p>
+        <button onclick="window.location.href='attendance.html'">Mark Attendance</button>
+    </div>
 </div>
-
-<div id="bookingFormContainer" style="display:none; margin-top: 20px;" class="container">
-    <h3>Book Room: <span id="selectedRoomName"></span></h3>
-    <label for="bookingDate">Date:</label>
-    <input type="date" id="bookingDate">
-    <label for="startTime">Start Time:</label>
-    <input type="time" id="startTime">
-    <label for="endTime">End Time:</label>
-    <input type="time" id="endTime">
-    <label for="teamName">Team Name:</label>
-    <input type="text" id="teamName" placeholder="Your Team Name">
-    <label for="purpose">Purpose (Optional):</label>
-    <input type="text" id="purpose" placeholder="Meeting Purpose">
-    <button onclick="submitBookingRequest()">Request Booking</button>
-    <div id="bookingStatusMessage" style="color: blue; margin-top:10px;"></div>
-</div>
-
-<script>
-    const citySelect = document.getElementById('citySelect');
-    const officesContainer = document.getElementById('officesContainer');
-    const loadingMessage = document.getElementById('loadingMessage');
-    const errorMessageElement = document.getElementById('errorMessage');
-    const loggedInUsernameEl = document.getElementById('loggedInUsername');
-    const loggedInUserRoleEl = document.getElementById('loggedInUserRole');
-
-    const bookingFormContainer = document.getElementById('bookingFormContainer');
-    const selectedRoomNameEl = document.getElementById('selectedRoomName');
-    const bookingDateInput = document.getElementById('bookingDate');
-    const startTimeInput = document.getElementById('startTime');
-    const endTimeInput = document.getElementById('endTime');
-    const teamNameInput = document.getElementById('teamName');
-    const purposeInput = document.getElementById('purpose');
-    const bookingStatusMessage = document.getElementById('bookingStatusMessage');
-    let currentRoomToBook = null;
-
-
-    const JWT_TOKEN_KEY = 'smartoffice_jwt_token'; // Must match the key used in login.html
-
-    function getAuthToken() {
-        return localStorage.getItem(JWT_TOKEN_KEY);
-    }
-
-    function getUsername() {
-        return localStorage.getItem('smartoffice_username');
-    }
-
-    function getUserRole() {
-        return localStorage.getItem('smartoffice_userRole');
-    }
-
-    function showLoading(isLoading) {
-        loadingMessage.style.display = isLoading ? 'block' : 'none';
-    }
-
-    function displayError(message) {
-        errorMessageElement.textContent = message;
-        errorMessageElement.style.display = message ? 'block' : 'none';
-        if (message) console.error("Error Displayed:", message);
-    }
-
-    async function makeApiCall(url, options = {}) {
-        const token = getAuthToken();
-        if (!token) {
-            displayError('Authentication token not found. Please log in.');
-            window.location.href = '/login.html'; // Redirect to login if no token
-            throw new Error('No token'); // Stop further execution
-        }
-
-        const defaultHeaders = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json' // Default, can be overridden
-        };
-
-        options.headers = {...defaultHeaders, ...options.headers};
-
-        const response = await fetch(url, options);
-
-        if (response.status === 401 || response.status === 403) {
-            // Unauthorized or Forbidden
-            localStorage.removeItem(JWT_TOKEN_KEY); // Clear invalid token
-            localStorage.removeItem('smartoffice_username');
-            localStorage.removeItem('smartoffice_userRole');
-            displayError('Your session has expired or is invalid. Please log in again.');
-            window.location.href = '/login.html'; // Redirect to login
-            throw new Error('Unauthorized/Forbidden'); // Stop further execution
-        }
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({message: `HTTP error! status: ${response.status}`}));
-            throw new Error(errorData.message || `API call failed: ${response.status}`);
-        }
-        return response.json();
-    }
-
-
-    async function fetchCities() {
-        showLoading(true);
-        displayError('');
-        try {
-            const citiesData = await makeApiCall('/api/bookings/cities');
-            citySelect.innerHTML = '<option value="">-- Select a City --</option>';
-            citiesData.forEach(cityObj => {
-                const option = document.createElement('option');
-                option.value = cityObj.cityName;
-                option.textContent = cityObj.cityName;
-                citySelect.appendChild(option);
-            });
-        } catch (error) {
-            // Error already displayed by makeApiCall or handled by redirection
-            if (error.message !== 'No token' && error.message !== 'Unauthorized/Forbidden') {
-                displayError(`Failed to load cities: ${error.message}`);
-            }
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    async function fetchOfficesAndRooms(cityName) {
-        if (!cityName) {
-            officesContainer.innerHTML = '';
-            return;
-        }
-        showLoading(true);
-        displayError('');
-        officesContainer.innerHTML = '';
-
-        try {
-            const officesData = await makeApiCall(`/api/bookings/offices/city/${encodeURIComponent(cityName)}`);
-            if (officesData.length === 0) {
-                officesContainer.innerHTML = '<p style="text-align:center; padding:10px;">No offices found in this city.</p>';
-                return;
-            }
-
-            officesData.forEach(office => {
-                const officeDiv = document.createElement('div');
-                officeDiv.className = 'office-section';
-                let roomsHtml = office.rooms.map(room => `
-                        <li>
-                            <strong>${room.name}</strong>
-                            <span>Capacity: ${room.capacity}</span> |
-                            <span>Floor: ${room.floor || 'N/A'}</span> |
-                            <span>AV: ${room.hasAVEquipment ? 'Yes' : 'No'}</span>
-                            <p class="description">${room.description || ''}</p>
-                            <button class="book-room-btn" onclick="showBookingForm(${room.id}, '${escapeSingleQuotes(room.name)}')">Book This Room</button>
-                        </li>
-                    `).join('');
-                if (office.rooms.length === 0) {
-                    roomsHtml = '<li>No rooms listed for this office location.</li>';
-                }
-
-                officeDiv.innerHTML = `
-                        <h3 class="office-title">${office.officeName}</h3>
-                        <p>${office.address || 'Address not available'}</p>
-                        <ul class="room-list">${roomsHtml}</ul>
-                    `;
-                officesContainer.appendChild(officeDiv);
-            });
-
-        } catch (error) {
-            if (error.message !== 'No token' && error.message !== 'Unauthorized/Forbidden') {
-                displayError(`Failed to load offices for ${cityName}: ${error.message}`);
-            }
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    function escapeSingleQuotes(str) {
-        if (typeof str !== 'string') return '';
-        return str.replace(/'/g, '\\\''); // Escapes single quotes for use in JS function calls within HTML
-    }
-
-    function showBookingForm(roomId, roomName) {
-        currentRoomToBook = roomId;
-        selectedRoomNameEl.textContent = roomName;
-        bookingFormContainer.style.display = 'block';
-        bookingStatusMessage.textContent = '';
-
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        bookingDateInput.value = `${yyyy}-${mm}-${dd}`;
-
-        const nextHour = new Date(today.getTime() + 30 * 60000); // Default start 30 mins from now
-        const startH = String(nextHour.getHours()).padStart(2, '0');
-        const startM = String(Math.ceil(nextHour.getMinutes() / 15) * 15 % 60).padStart(2, '0'); // Snap to next 15 mins
-        startTimeInput.value = `${startH}:${startM}`;
-
-        const endHourDate = new Date(nextHour.getTime() + 60 * 60000); // Default 1 hour duration
-        const endH = String(endHourDate.getHours()).padStart(2, '0');
-        const endM = String(Math.ceil(endHourDate.getMinutes() / 15) * 15 % 60).padStart(2, '0');
-        endTimeInput.value = `${endH}:${endM}`;
-
-        teamNameInput.value = localStorage.getItem('smartoffice_username') || ''; // Pre-fill with username or team name if stored
-        purposeInput.value = ''; // Clear purpose
-
-        bookingDateInput.min = `${yyyy}-${mm}-${dd}`; // Don't allow past dates
-    }
-
-    async function submitBookingRequest() {
-        if (!currentRoomToBook) {
-            alert('No room selected for booking.');
-            return;
-        }
-
-        const bookingPayload = {
-            roomId: currentRoomToBook,
-            startTime: `${bookingDateInput.value}T${startTimeInput.value}:00`,
-            endTime: `${bookingDateInput.value}T${endTimeInput.value}:00`,
-            teamName: teamNameInput.value,
-            purpose: purposeInput.value
-        };
-
-        bookingStatusMessage.style.color = '#e74c3c'; // Default error color
-        if (!bookingPayload.teamName) {
-            bookingStatusMessage.textContent = 'Team name is required.';
-            return;
-        }
-        const startDateTime = new Date(bookingPayload.startTime);
-        const endDateTime = new Date(bookingPayload.endTime);
-        if (startDateTime >= endDateTime) {
-            bookingStatusMessage.textContent = 'End time must be after start time.';
-            return;
-        }
-        const nowPlusCertainMinutes = new Date(new Date().getTime() + 29 * 60000); // Allow 29 for boundary
-        if (startDateTime < nowPlusCertainMinutes) {
-            bookingStatusMessage.textContent = 'Bookings must be made at least 30 minutes in advance from now.';
-            return;
-        }
-
-
-        bookingStatusMessage.textContent = 'Submitting request...';
-        bookingStatusMessage.style.color = '#3498db';
-        showLoading(true);
-
-        try {
-            const bookingConfirmation = await makeApiCall('/api/bookings/request', {
-                method: 'POST',
-                body: JSON.stringify(bookingPayload)
-            });
-
-            bookingStatusMessage.textContent = `Booking request sent for ${bookingConfirmation.roomName || selectedRoomNameEl.textContent}! Status: ${bookingConfirmation.status}. You'll be notified upon approval.`;
-            bookingStatusMessage.style.color = '#2ecc71';
-            // bookingFormContainer.style.display = 'none'; // Optionally hide form
-        } catch (error) {
-            if (error.message !== 'No token' && error.message !== 'Unauthorized/Forbidden') {
-                bookingStatusMessage.textContent = `Error: ${error.message}`;
-            }
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem(JWT_TOKEN_KEY);
-        localStorage.removeItem('smartoffice_username');
-        localStorage.removeItem('smartoffice_userRole');
-        window.location.href = "/login.html";
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const token = getAuthToken();
-        const username = getUsername();
-        const role = getUserRole();
-
-        if (username) loggedInUsernameEl.textContent = username;
-        if (role) loggedInUserRoleEl.textContent = role;
-
-        if (!token) {
-            // Redirect to login if no token is found
-            console.log("No token found, redirecting to login.");
-            window.location.href = '/login.html';
-        } else {
-            // Token exists, proceed to fetch cities
-            console.log("Token found, fetching cities.");
-            fetchCities();
-        }
-    });
-
-    citySelect.addEventListener('change', (event) => {
-        fetchOfficesAndRooms(event.target.value);
-    });
-
-</script>
 </body>
 </html>

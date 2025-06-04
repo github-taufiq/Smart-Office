@@ -24,22 +24,6 @@ public class ParkingController {
         return ResponseEntity.ok(parkingService.getAvailableSlots());
     }
 
-    /*
-    @PostMapping("/slots/{slotId}/reserve")
-    public ResponseEntity<?> reserveSlot(@PathVariable Long slotId, //@RequestBody Map<String,
-            @RequestParam String userName) {
-        try {
-//            String userName = request.get("userName");
-            if (userName == null || userName.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "User name is required"));
-            }
-            
-            ParkingSlot slot = parkingService.reserveSlot(slotId, userName.trim());
-            return ResponseEntity.ok(slot);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }*/
     @PostMapping("/slots/{slotId}/reserve")
     public ResponseEntity<?> reserveSlot(
             @PathVariable Long slotId,
@@ -81,9 +65,6 @@ public class ParkingController {
     public ResponseEntity<?> occupyReservedSlot(@PathVariable Long slotId,
                                                 @RequestParam String userName, @RequestParam String licensePlate) {
         try {
-//            String licensePlate = request.get("licensePlate");
-//            String userName = request.get("userName");
-
             if (licensePlate == null || licensePlate.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "License plate is required"));
             }

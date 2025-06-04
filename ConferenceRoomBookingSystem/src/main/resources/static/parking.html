@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parking Lot Booking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+        header { background: #3498db; color: #fff; padding: 24px 0; text-align: center; font-size: 2rem; font-weight: 600; }
+        .container { max-width: 800px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 32px; }
+        h2 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e1e1e1; text-align: left; }
+        th { background: #f0f6fa; }
+        button { background: #3498db; color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 1rem; cursor: pointer; }
+        button:disabled { background: #b2bec3; cursor: not-allowed; }
+        .message { margin: 18px 0; color: #27ae60; font-weight: 500; }
+        .error { color: #c0392b; }
+    </style>
+</head>
+<body>
+<header>
+    Parking Lot Booking
+</header>
+<div class="container">
+    <h2>Available Parking Slots</h2>
+    <div id="message" class="message"></div>
+    <table id="slotsTable">
+        <thead>
+        <tr>
+            <th>Slot ID</th>
+            <th>Row</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Slots will be loaded here -->
+        </tbody>
+    </table>
+</div>
+<script>
+    const API_BASE = "http://localhost:8080/api/parking";
+    const tableBody = document.querySelector("#slotsTable tbody");
+    const messageDiv = document.getElementById("message");
+
+    function showMessage(msg, isError = false) {
+        messageDiv.textContent = msg;
+        messageDiv.className = isError ? "message error" : "message";
+    }
+
+    function loadSlots() {
+        fetch(`${API_BASE}/slots/available`)
+            .then(res => res.json())
+            .then(slots => {
+                tableBody.innerHTML = "";
+                if (!slots.length) {
+                    tableBody.innerHTML = `<tr><td colspan="4">No available slots.</td></tr>`;
+                    return;
+                }
+                slots.forEach(slot => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${slot.id}</td>
+                        <td>${slot.rowName || slot.row || "-"}</td>
+                        <td>${slot.status}</td>
+                        <td>
+                            <button onclick="reserveSlot(${slot.id})">Reserve</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            })
+            .catch(() => showMessage("Failed to load slots.", true));
+    }
+
+    window.reserveSlot = function(slotId) {
+        const userName = prompt("Enter your name to reserve this slot:");
+        if (!userName || !userName.trim()) {
+            showMessage("Reservation cancelled or invalid name.", true);
+            return;
+        }
+        fetch(`${API_BASE}/slots/${slotId}/reserve?userName=${encodeURIComponent(userName.trim())}`, {
+            method: "POST"
+        })
+            .then(res => res.json().then(data => ({ok: res.ok, data})))
+            .then(({ok, data}) => {
+                if (ok) {
+                    showMessage(`Slot ${slotId} reserved successfully!`);
+                    loadSlots();
+                } else {
+                    showMessage(data.error || "Reservation failed.", true);
+                }
+            })
+            .catch(() => showMessage("Reservation failed.", true));
+    };
+
+    loadSlots();
+</script>
+</body>
+</html>
