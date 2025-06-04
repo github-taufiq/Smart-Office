@@ -2,6 +2,7 @@ package com.lift.conf.system.smartoffice.dto;
 
 import com.lift.conf.system.smartoffice.model.BookingStatus;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data

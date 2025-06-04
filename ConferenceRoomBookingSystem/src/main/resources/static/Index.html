@@ -5,33 +5,192 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartOffice Dashboard - Rooms</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; color: #333; }
-        header { background-color: #3498db; color: white; padding: 15px 25px; text-align: center; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        header h1 { margin: 0; font-size: 24px; }
-        nav a { color: white; margin: 0 10px; text-decoration: none; font-weight: 500; }
-        nav a:hover { text-decoration: underline; }
-        .container { background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        label { display: block; margin-bottom: 8px; font-weight: 500; color: #34495e; }
-        select, input[type="text"], input[type="date"], input[type="time"], button { width: 100%; padding: 12px; margin-bottom: 18px; border-radius: 6px; border: 1px solid #bdc3c7; box-sizing: border-box; font-size: 15px; }
-        input[type="text"], input[type="date"], input[type="time"] { width: calc(100% - 24px); } /* Account for padding */
-        select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px auto; padding-right: 30px; }
-        button { background-color: #2ecc71; color: white; cursor: pointer; font-weight: 600; border: none; transition: background-color 0.3s; }
-        button:hover { background-color: #27ae60; }
-        button.book-room-btn { background-color: #3498db; margin-top:5px; padding: 8px 12px; font-size: 14px;}
-        button.book-room-btn:hover { background-color: #2980b9; }
-        .office-section { margin-top: 25px; border: 1px solid #ecf0f1; padding: 20px; border-radius: 6px; background-color: #f9fafb; }
-        .office-title { font-size: 20px; font-weight: 600; color: #2c3e50; margin-bottom: 12px; border-bottom: 1px solid #ecf0f1; padding-bottom: 8px;}
-        .room-list { list-style-type: none; padding-left: 0; }
-        .room-list li { background-color: #fff; border: 1px solid #e0e0e0; padding: 15px; margin-bottom: 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .room-list li strong { display: block; color: #34495e; font-size: 17px; margin-bottom: 5px; }
-        .room-list li span { font-size: 14px; color: #7f8c8d; margin-right: 10px; }
-        .room-list li p.description { font-size: 14px; color: #555; margin-top: 8px; }
-        #loadingMessage, #errorMessage { text-align: center; padding: 12px; margin-top: 15px; border-radius: 6px; font-weight: 500; }
-        #loadingMessage { color: #3498db; background-color: #eaf5ff; border: 1px solid #aed6f1; }
-        #errorMessage { color: #e74c3c; background-color: #fdedec; border: 1px solid #f5b7b1; }
-        .user-info { color: white; font-size: 14px; }
-        .logout-button { background-color: #e74c3c; font-size: 14px; padding: 8px 15px; width: auto;}
-        .logout-button:hover { background-color: #c0392b; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #34495e;
+        }
+
+        select, input[type="text"], input[type="date"], input[type="time"], button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 6px;
+            border: 1px solid #bdc3c7;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        input[type="text"], input[type="date"], input[type="time"] {
+            width: calc(100% - 24px);
+        }
+
+        /* Account for padding */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px auto;
+            padding-right: 30px;
+        }
+
+        button {
+            background-color: #2ecc71;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #27ae60;
+        }
+
+        button.book-room-btn {
+            background-color: #3498db;
+            margin-top: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        button.book-room-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .office-section {
+            margin-top: 25px;
+            border: 1px solid #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            background-color: #f9fafb;
+        }
+
+        .office-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 8px;
+        }
+
+        .room-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .room-list li {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .room-list li strong {
+            display: block;
+            color: #34495e;
+            font-size: 17px;
+            margin-bottom: 5px;
+        }
+
+        .room-list li span {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-right: 10px;
+        }
+
+        .room-list li p.description {
+            font-size: 14px;
+            color: #555;
+            margin-top: 8px;
+        }
+
+        #loadingMessage, #errorMessage {
+            text-align: center;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        #loadingMessage {
+            color: #3498db;
+            background-color: #eaf5ff;
+            border: 1px solid #aed6f1;
+        }
+
+        #errorMessage {
+            color: #e74c3c;
+            background-color: #fdedec;
+            border: 1px solid #f5b7b1;
+        }
+
+        .user-info {
+            color: white;
+            font-size: 14px;
+        }
+
+        .logout-button {
+            background-color: #e74c3c;
+            font-size: 14px;
+            padding: 8px 15px;
+            width: auto;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +268,7 @@
     function getUsername() {
         return localStorage.getItem('smartoffice_username');
     }
+
     function getUserRole() {
         return localStorage.getItem('smartoffice_userRole');
     }
@@ -136,7 +296,7 @@
             'Content-Type': 'application/json' // Default, can be overridden
         };
 
-        options.headers = { ...defaultHeaders, ...options.headers };
+        options.headers = {...defaultHeaders, ...options.headers};
 
         const response = await fetch(url, options);
 
@@ -150,7 +310,7 @@
             throw new Error('Unauthorized/Forbidden'); // Stop further execution
         }
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+            const errorData = await response.json().catch(() => ({message: `HTTP error! status: ${response.status}`}));
             throw new Error(errorData.message || `API call failed: ${response.status}`);
         }
         return response.json();
@@ -208,7 +368,7 @@
                             <button class="book-room-btn" onclick="showBookingForm(${room.id}, '${escapeSingleQuotes(room.name)}')">Book This Room</button>
                         </li>
                     `).join('');
-                if(office.rooms.length === 0){
+                if (office.rooms.length === 0) {
                     roomsHtml = '<li>No rooms listed for this office location.</li>';
                 }
 
@@ -264,7 +424,8 @@
 
     async function submitBookingRequest() {
         if (!currentRoomToBook) {
-            alert('No room selected for booking.'); return;
+            alert('No room selected for booking.');
+            return;
         }
 
         const bookingPayload = {
@@ -277,16 +438,19 @@
 
         bookingStatusMessage.style.color = '#e74c3c'; // Default error color
         if (!bookingPayload.teamName) {
-            bookingStatusMessage.textContent = 'Team name is required.'; return;
+            bookingStatusMessage.textContent = 'Team name is required.';
+            return;
         }
         const startDateTime = new Date(bookingPayload.startTime);
         const endDateTime = new Date(bookingPayload.endTime);
         if (startDateTime >= endDateTime) {
-            bookingStatusMessage.textContent = 'End time must be after start time.'; return;
+            bookingStatusMessage.textContent = 'End time must be after start time.';
+            return;
         }
         const nowPlusCertainMinutes = new Date(new Date().getTime() + 29 * 60000); // Allow 29 for boundary
         if (startDateTime < nowPlusCertainMinutes) {
-            bookingStatusMessage.textContent = 'Bookings must be made at least 30 minutes in advance from now.'; return;
+            bookingStatusMessage.textContent = 'Bookings must be made at least 30 minutes in advance from now.';
+            return;
         }
 
 

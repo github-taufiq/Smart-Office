@@ -11,7 +11,9 @@ import java.util.Optional;
 @Repository
 public interface AttendanceRecordRepository extends JpaRepository<AttendanceRecord, Long> {
     Optional<AttendanceRecord> findByUserIdAndAttendanceDate(String userId, LocalDate attendanceDate);
+
     List<AttendanceRecord> findByUserIdAndAttendanceDateBetweenOrderByAttendanceDateDesc(String userId, LocalDate startDate, LocalDate endDate);
+
     List<AttendanceRecord> findByAttendanceDate(LocalDate attendanceDate); // For admin view of daily attendance
     // Add more queries as needed (e.g., by status, by date range for admin reports)
 }

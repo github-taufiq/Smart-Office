@@ -1,4 +1,5 @@
 package com.lift.conf.system.attendencebookingsystem.dto;
+
 import lombok.Data;
 
 @Data

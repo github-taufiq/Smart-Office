@@ -1,4 +1,5 @@
 package com.lift.conf.system.smartoffice.dto;
+
 import lombok.Data;
 
 @Data

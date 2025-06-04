@@ -28,7 +28,8 @@ public class AttendanceController {
     private AttendanceService attendanceService;
 
     @PostMapping("/mark")
-    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('OFFICE_ADMIN') or hasRole('MANAGER')") // Or just EMPLOYEE if admins use a different system for corrections
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('OFFICE_ADMIN') or hasRole('MANAGER')")
+    // Or just EMPLOYEE if admins use a different system for corrections
     public ResponseEntity<AttendanceResponseDto> markAttendance(@Valid @RequestBody AttendanceRequestDto attendanceRequestDto) throws BadRequestException {
         AttendanceResponseDto responseDto = attendanceService.markAttendance(attendanceRequestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);

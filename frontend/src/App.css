@@ -1,132 +1,132 @@
 /* Compact Parking Slot Styles */
 .parking-slot-compact {
-  transition: all 0.2s ease;
-  user-select: none;
+    transition: all 0.2s ease;
+    user-select: none;
 }
 
 .parking-slot-compact:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
 }
 
 .parking-slot-compact:active {
-  transform: scale(0.98) !important;
+    transform: scale(0.98) !important;
 }
 
 /* Grid Layout for Slots */
 .parking-slots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 8px;
-  padding: 4px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    padding: 4px;
 }
 
 .parking-slot-item {
-  min-width: 100px;
-  max-width: 150px;
+    min-width: 100px;
+    max-width: 150px;
 }
 
 /* Mobile Responsive */
 @media (max-width: 576px) {
-  .parking-slots-grid {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-    gap: 6px;
-  }
-  
-  .parking-slot-item {
-    min-width: 90px;
-    max-width: 120px;
-  }
-  
-  .parking-slot-compact {
-    min-height: 70px !important;
-  }
+    .parking-slots-grid {
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 6px;
+    }
+
+    .parking-slot-item {
+        min-width: 90px;
+        max-width: 120px;
+    }
+
+    .parking-slot-compact {
+        min-height: 70px !important;
+    }
 }
 
 @media (min-width: 577px) and (max-width: 768px) {
-  .parking-slots-grid {
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 8px;
-  }
+    .parking-slots-grid {
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 8px;
+    }
 }
 
 @media (min-width: 769px) {
-  .parking-slots-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
-  }
-  
-  .parking-slot-item {
-    max-width: 160px;
-  }
+    .parking-slots-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .parking-slot-item {
+        max-width: 160px;
+    }
 }
 
 /* Animation for editing state */
 @keyframes editingPulse {
-  0% {
-    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.5);
-  }
-  100% {
-    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
-  }
+    0% {
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.5);
+    }
+    100% {
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+    }
 }
 
 .parking-slot-compact[style*="scale(1.02)"] {
-  animation: editingPulse 1s infinite;
+    animation: editingPulse 1s infinite;
 }
 
 /* Status-specific styles */
 .status-available {
-  background-color: #d1e7dd !important;
-  border-color: #198754 !important;
+    background-color: #d1e7dd !important;
+    border-color: #198754 !important;
 }
 
 .status-occupied {
-  background-color: #fff3cd !important;
-  border-color: #fd7e14 !important;
+    background-color: #fff3cd !important;
+    border-color: #fd7e14 !important;
 }
 
 .status-reserved {
-  background-color: #d1ecf1 !important;
-  border-color: #0dcaf0 !important;
+    background-color: #d1ecf1 !important;
+    border-color: #0dcaf0 !important;
 }
 
 .status-out-of-order {
-  background-color: #e2e3e5 !important;
-  border-color: #6c757d !important;
+    background-color: #e2e3e5 !important;
+    border-color: #6c757d !important;
 }
 
 .status-editing {
-  background-color: #e7f3ff !important;
-  border-color: #0d6efd !important;
-  border-width: 2px !important;
+    background-color: #e7f3ff !important;
+    border-color: #0d6efd !important;
+    border-width: 2px !important;
 }
 
 .status-disabled {
-  background-color: #f8f9fa !important;
-  border-color: #dee2e6 !important;
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
 }
 
 /* Status Badge Colors */
 .badge-available {
-  background-color: #198754 !important;
-  color: white !important;
+    background-color: #198754 !important;
+    color: white !important;
 }
 
 .badge-occupied {
-  background-color: #fd7e14 !important;
-  color: white !important;
+    background-color: #fd7e14 !important;
+    color: white !important;
 }
 
 .badge-reserved {
-  background-color: #0dcaf0 !important;
-  color: white !important;
+    background-color: #0dcaf0 !important;
+    color: white !important;
 }
 
 .badge-out-of-order {
-  background-color: #6c757d !important;
-  color: white !important;
+    background-color: #6c757d !important;
+    color: white !important;
 }

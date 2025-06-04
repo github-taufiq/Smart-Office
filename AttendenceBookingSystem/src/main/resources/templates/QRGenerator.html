@@ -9,13 +9,16 @@
     <style>
         /* Custom font, similar to modern apps */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
         }
+
         /* Styling for the QR code placeholder */
         #qrcode canvas, #qrcode img {
             margin: auto; /* Center the QR code */
         }
+
         .qr-placeholder {
             width: 276px; /* Match QR code size + padding */
             height: 276px;
@@ -34,7 +37,11 @@
 
 <div class="bg-white shadow-2xl rounded-xl p-6 md:p-10 w-full max-w-md transform transition-all duration-500 ease-in-out">
     <header class="text-center mb-8">
-        <svg class="w-16 h-16 mx-auto mb-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h-1m-1-6V4m0 1.083A9.002 9.002 0 0012 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.314-.016-.625-.046-.932M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <svg class="w-16 h-16 mx-auto mb-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+             xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4v1m6 11h-1m-1-6V4m0 1.083A9.002 9.002 0 0012 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.314-.016-.625-.046-.932M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
         <h1 class="text-3xl font-bold text-slate-800">Office Gate Check-in</h1>
         <p class="text-slate-500 mt-2">Enter your Employee ID to generate a secure QR code for today's check-in.</p>
     </header>
@@ -49,7 +56,11 @@
 
         <button onclick="generateQrCode()"
                 class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition duration-150 ease-in-out">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4L3 9l9 5 9-5-9-5zM3.5 9.5L12 14.5l8.5-5M12 20l-9-5 9-5 9 5-9 5z"></path></svg>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 4L3 9l9 5 9-5-9-5zM3.5 9.5L12 14.5l8.5-5M12 20l-9-5 9-5 9 5-9 5z"></path>
+            </svg>
             Generate My Check-in QR
         </button>
     </div>
@@ -57,9 +68,10 @@
     <div id="qrContainer" class="mt-8 text-center">
         <div id="qrcode" class="w-[276px] h-[276px] mx-auto bg-white p-0 rounded-lg shadow-inner">
         </div>
-        <p id="qrMessage" class="text-sm text-slate-600 mt-4 h-5"></p> </div>
+        <p id="qrMessage" class="text-sm text-slate-600 mt-4 h-5"></p></div>
     <footer class="mt-8 text-center">
-        <p class="text-xs text-slate-400">&copy; <span id="currentYear"></span> Altimetrik Corp. All rights reserved.</p>
+        <p class="text-xs text-slate-400">&copy; <span id="currentYear"></span> Altimetrik Corp. All rights reserved.
+        </p>
     </footer>
 </div>
 
@@ -73,6 +85,7 @@
         qrCodeElement.innerHTML = '<div class="qr-placeholder"><span>Enter your ID and click generate to display your QR code here.</span></div>';
         qrMessageElement.textContent = '';
     }
+
     showQrPlaceholder();
 
 
@@ -110,9 +123,9 @@
                     text: qrDataString,
                     width: 256,
                     height: 256,
-                    colorDark : "#0f172a", // slate-900
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
+                    colorDark: "#0f172a", // slate-900
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
                 });
                 // Add padding to the container AFTER QR is generated if needed, but qrcode.js usually handles its own canvas size.
                 // The parent div #qrcode has p-0, so the QR code itself will fill it. The size set in new QRCode is for the QR data area.

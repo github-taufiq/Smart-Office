@@ -154,7 +154,7 @@ public class BookingService {
                 adminUser.getManagedOffice() == null ||
                 !adminUser.getManagedOffice().getId().equals(bookingOffice.getId())) {
             // Also allow SUPER_ADMIN to approve any booking
-            if(adminUser.getRole() != UserRole.ROLE_SUPER_ADMIN) {
+            if (adminUser.getRole() != UserRole.ROLE_SUPER_ADMIN) {
                 throw new UnauthorizedOperationException("You are not authorized to manage bookings for this office.");
             }
         }
@@ -195,7 +195,7 @@ public class BookingService {
     public List<BookingResponseDto> getPendingBookingsForMyOffice() {
         User adminUser = getCurrentUser();
         if (adminUser.getRole() != UserRole.ROLE_OFFICE_ADMIN || adminUser.getManagedOffice() == null) {
-            if(adminUser.getRole() == UserRole.ROLE_SUPER_ADMIN){ // Super admin can see all pending
+            if (adminUser.getRole() == UserRole.ROLE_SUPER_ADMIN) { // Super admin can see all pending
                 return bookingRepository.findByStatusOrderByRequestTimestampAsc(BookingStatus.PENDING_APPROVAL)
                         .stream().map(this::mapToBookingResponseDto).collect(Collectors.toList());
             }
@@ -231,7 +231,7 @@ public class BookingService {
         if (adminUser.getRole() != UserRole.ROLE_OFFICE_ADMIN ||
                 adminUser.getManagedOffice() == null ||
                 !adminUser.getManagedOffice().getId().equals(bookingOffice.getId())) {
-            if(adminUser.getRole() != UserRole.ROLE_SUPER_ADMIN) {
+            if (adminUser.getRole() != UserRole.ROLE_SUPER_ADMIN) {
                 throw new UnauthorizedOperationException("You are not authorized to cancel bookings for this office.");
             }
         }

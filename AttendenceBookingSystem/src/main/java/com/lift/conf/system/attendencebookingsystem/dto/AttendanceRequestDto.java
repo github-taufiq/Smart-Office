@@ -4,6 +4,7 @@ import com.lift.conf.system.attendencebookingsystem.model.AttendanceStatus;
 import com.lift.conf.system.attendencebookingsystem.model.CheckInMethod;
 import com.lift.conf.system.attendencebookingsystem.model.LeaveType;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalTime; // For check-in/out if provided manually
 

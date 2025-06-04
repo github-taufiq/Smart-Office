@@ -1,5 +1,7 @@
+// In: conference-room-booking-system/src/main/java/com/lift/conf/system/smartoffice/security/SecurityConfig.java
 package com.lift.conf.system.smartoffice.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,7 +10,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,17 +21,14 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // To enable @PreAuthorize, @PostAuthorize, etc.
+@EnableMethodSecurity(prePostEnabled = true) // Enables @PreAuthorize, etc.
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          JwtAuthenticationEntryPoint unauthorizedHandler) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.unauthorizedHandler = unauthorizedHandler;
-    }
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,18 +45,18 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*"); // Or specify your frontend URL e.g. http://localhost:3000
+        // For development, "*" is okay. For production, specify your frontend origin.
+        config.addAllowedOriginPattern("*"); // e.g., "http://localhost:8080" if served from same, or your frontend dev server port
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(request -> { // Another way to configure CORS
+                .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration conf = new CorsConfiguration();
                     conf.addAllowedOriginPattern("*"); // Replace with specific origins in prod
                     conf.addAllowedMethod("*");
@@ -66,17 +64,21 @@ public class SecurityConfig {
                     conf.setAllowCredentials(true);
                     return conf;
                 }))
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF as we are using JWT
+                .csrf(csrf -> csrf.disable()) // Disable CSRF as we are using JWT
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Login and registration endpoints
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow CORS preflight requests
-                        // Room listing can be public or require authentication depending on your needs
-                        .requestMatchers(HttpMethod.POST,"/api/bookings/available-rooms").permitAll() // Example: Allow viewing available rooms without full auth
-                        // Secure other endpoints as needed
-                        // .requestMatchers("/api/admin/**").hasRole("OFFICE_ADMIN") // This is now handled by @PreAuthorize mostly
-                        .anyRequest().authenticated() // All other requests require authentication
+                        // Allow access to authentication and registration APIs
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Allow access to static HTML/CSS/JS files
+                        .requestMatchers("/", "/*.html", "/static/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        // Allow OPTIONS requests for CORS preflight
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Secure your booking APIs (and any other data APIs)
+                        .requestMatchers("/api/bookings/**").authenticated()
+                        .requestMatchers("/api/parking/**").authenticated() // For the parking feature later
+                        // Any other request must be authenticated
+                        .anyRequest().authenticated()
                 );
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -84,3 +86,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+    
