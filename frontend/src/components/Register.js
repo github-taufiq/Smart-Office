@@ -1,23 +1,24 @@
-import React, {useState} from 'react';
-import {Alert, Button, Card, Col, Container, Form, Row, Spinner} from 'react-bootstrap';
-import {Link, useNavigate} from 'react-router-dom';
-import {useAuth} from '../context/AuthContext';
+import React, { useState } from 'react';
+import { Alert, Button, Card, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
-    const {register, loading} = useAuth();
+    const { register, loading } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
+        username: '',
         password: '',
         confirmPassword: '',
-        department: '',
-        officeId: 1
+        fullName: '',
+        defaultTeamName: '',
+        role: 'ROLE_EMPLOYEE',
+        managedOfficeId: ''
     });
-    const [message, setMessage] = useState({type: '', text: ''});
+    const [message, setMessage] = useState({ type: '', text: '' });
 
     const handleInputChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -26,21 +27,31 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage({type: '', text: ''});
+        setMessage({ type: '', text: '' });
 
         if (formData.password !== formData.confirmPassword) {
-            setMessage({type: 'danger', text: 'Passwords do not match'});
+            setMessage({ type: 'danger', text: 'Passwords do not match' });
             return;
         }
 
-        const {confirmPassword, ...registrationData} = formData;
+        const { confirmPassword, ...registrationData } = formData;
+        // Convert managedOfficeId to number or undefined
+        if (registrationData.role !== 'ROLE_OFFICE_ADMIN') {
+            delete registrationData.managedOfficeId;
+        } else if (registrationData.managedOfficeId === '') {
+            setMessage({ type: 'danger', text: 'Managed Office ID is required for Office Admins.' });
+            return;
+        } else {
+            registrationData.managedOfficeId = Number(registrationData.managedOfficeId);
+        }
+
         const result = await register(registrationData);
 
         if (result.success) {
-            setMessage({type: 'success', text: 'Registration successful! Please login.'});
+            setMessage({ type: 'success', text: 'Registration successful! Please login.' });
             setTimeout(() => navigate('/login'), 2000);
         } else {
-            setMessage({type: 'danger', text: result.error});
+            setMessage({ type: 'danger', text: result.error });
         }
     };
 
@@ -65,26 +76,26 @@ const Register = () => {
                                 <Row>
                                     <Col md={6}>
                                         <Form.Group className="mb-3">
-                                            <Form.Label>Full Name</Form.Label>
+                                            <Form.Label>Username</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                name="name"
-                                                value={formData.name}
+                                                name="username"
+                                                value={formData.username}
                                                 onChange={handleInputChange}
-                                                placeholder="Enter your full name"
+                                                placeholder="Enter username"
                                                 required
                                             />
                                         </Form.Group>
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group className="mb-3">
-                                            <Form.Label>Email</Form.Label>
+                                            <Form.Label>Full Name</Form.Label>
                                             <Form.Control
-                                                type="email"
-                                                name="email"
-                                                value={formData.email}
+                                                type="text"
+                                                name="fullName"
+                                                value={formData.fullName}
                                                 onChange={handleInputChange}
-                                                placeholder="Enter your email"
+                                                placeholder="Enter your full name"
                                                 required
                                             />
                                         </Form.Group>
@@ -92,16 +103,44 @@ const Register = () => {
                                 </Row>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Department</Form.Label>
+                                    <Form.Label>Default Team Name</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        name="department"
-                                        value={formData.department}
+                                        name="defaultTeamName"
+                                        value={formData.defaultTeamName}
                                         onChange={handleInputChange}
-                                        placeholder="Enter your department"
+                                        placeholder="Enter your team name"
                                         required
                                     />
                                 </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Role</Form.Label>
+                                    <Form.Select
+                                        name="role"
+                                        value={formData.role}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="ROLE_EMPLOYEE">Employee</option>
+                                        <option value="ROLE_OFFICE_ADMIN">Office Admin</option>
+                                        <option value="ROLE_SUPER_ADMIN">Super Admin</option>
+                                    </Form.Select>
+                                </Form.Group>
+
+                                {formData.role === 'ROLE_OFFICE_ADMIN' && (
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Managed Office ID</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="managedOfficeId"
+                                            value={formData.managedOfficeId}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter managed office ID"
+                                            required
+                                        />
+                                    </Form.Group>
+                                )}
 
                                 <Row>
                                     <Col md={6}>
@@ -140,7 +179,7 @@ const Register = () => {
                                 >
                                     {loading ? (
                                         <>
-                                            <Spinner size="sm" className="me-2"/>
+                                            <Spinner size="sm" className="me-2" />
                                             Creating account...
                                         </>
                                     ) : (

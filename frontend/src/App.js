@@ -10,6 +10,9 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import ParkingDashboard from './pages/ParkingDashboard';
 import BookingView from './components/BookingView';
 import ProtectedRoute from './components/ProtectedRoute';
+import Home from './pages/Home';
+import AttendanceDashboard from './pages/AttendanceDashboard';
+import ConferenceBookingHome from './pages/ConferenceBookingHome';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -32,6 +35,9 @@ function App() {
                                                 <Route path="/parking" element={<ParkingDashboard/>}/>
                                                 <Route path="/conf-room" element={<BookingView/>}/>
                                                 <Route path="/dashboard" element={<AdminDashboard/>}/>
+                                                <Route path="/home" element={<Home/>}/>
+                                                <Route path="/attendance" element={<AttendanceDashboard/>}/>
+                                                <Route path="/conference-booking" element={<ConferenceBookingHome/>}/>
                                             </Routes>
                                         </AllProvidersWrapper>
                                     </ProtectedRoute>

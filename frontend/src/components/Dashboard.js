@@ -1,11 +1,11 @@
 import React from 'react';
-import {Alert, Button, Card, Col, Container, Row} from 'react-bootstrap';
-import {useAuth} from '../context/AuthContext';
+import { Alert, Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const {user, isAuthenticated} = useAuth();
-
-    console.log('Dashboard - rendering with user:', user, 'isAuthenticated:', isAuthenticated);
+    const { user, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     if (!isAuthenticated) {
         return (
@@ -21,9 +21,6 @@ const Dashboard = () => {
                 <Col>
                     <h2>Welcome to Smart Office Dashboard</h2>
                     <p className="text-muted">Hello, {user?.name || 'User'}!</p>
-                    <Alert variant="success">
-                        You are successfully logged in as: {user?.email} ({user?.role})
-                    </Alert>
                 </Col>
             </Row>
 
@@ -33,10 +30,7 @@ const Dashboard = () => {
                         <Card.Body className="text-center">
                             <h5>Parking Management</h5>
                             <p className="text-muted">Reserve parking spots and check availability</p>
-                            <Button
-                                variant="success"
-                                onClick={() => window.location.href = '/parking'}
-                            >
+                            <Button variant="success" onClick={() => navigate('/parking')}>
                                 Go to Parking
                             </Button>
                         </Card.Body>
@@ -46,10 +40,22 @@ const Dashboard = () => {
                 <Col md={6}>
                     <Card className="h-100 shadow-sm">
                         <Card.Body className="text-center">
-                            <h5>Conference Rooms</h5>
-                            <p className="text-muted">Book meeting rooms and check schedules</p>
-                            <Button variant="info" disabled>
-                                Coming Soon
+                            <h5>Conference Room Booking</h5>
+                            <p className="text-muted">Book rooms and manage meetings</p>
+                            <Button variant="primary" onClick={() => navigate('/conference-booking')}>
+                                Book Now
+                            </Button>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                <Col md={6}>
+                    <Card className="h-100 shadow-sm">
+                        <Card.Body className="text-center">
+                            <h5>Attendance System</h5>
+                            <p className="text-muted">View, check-in, and monitor attendance</p>
+                            <Button variant="warning" onClick={() => navigate('/attendance')}>
+                                View Attendance
                             </Button>
                         </Card.Body>
                     </Card>
